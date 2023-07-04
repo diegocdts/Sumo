@@ -1,17 +1,12 @@
 import traci
 import time
-import pytz
-import datetime
 from random import randrange
 import pandas as pd
 
 
-# TODO: change get_datatime to return epoch time
 def get_datetime():
-    utc_now = pytz.utc.localize(datetime.datetime.utcnow())
-    current_datetime = utc_now.astimezone(pytz.timezone('Asia/Singapore'))
-    _datetime = current_datetime.strftime('%Y-%m-%d %H:%M:%S')
-    return _datetime
+    epoch_time = int(time.time())
+    return epoch_time
 
 
 def flatten_list(_2d_list):
