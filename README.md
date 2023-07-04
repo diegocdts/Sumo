@@ -11,5 +11,7 @@ python osmWebWizard.py
 ```
 
 ## sumo_run.py
+The sumo_run.py script must be pasted into a scenario directory to be used.
 
-The sumo_run.py script is used to simulate scenarios and GET simulation information
+It simulates scenarios and GET simulation information, apply some custom machine learning method and SET new simulation
+data.
