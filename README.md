@@ -9,3 +9,7 @@ To open the Osm Web Wizard, run the command bellow:
 cd /usr/share/sumo/tools/
 python osmWebWizard.py
 ```
+
+## sumo_run.py
+
+The sumo_run.py script is used to simulate scenarios and GET simulation information
