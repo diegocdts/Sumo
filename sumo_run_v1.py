@@ -1,9 +1,16 @@
-import traci
+import csv
+import os
 import time
-import pandas as pd
+import traci
+
+from datetime import datetime
 
 
-# TODO: change get_datatime to return epoch time
+def exists_path(name):
+    if not os.path.exists(name):
+        os.makedirs(name)
+
+
 def get_datetime():
     epoch_time = int(time.time())
     return epoch_time
@@ -23,12 +30,9 @@ def flatten_list(_2d_list):
 sumoCmd = ['sumo', '-c', 'osm.sumocfg']
 traci.start(sumoCmd)
 
-packVehicleData = []
-packTLSData = []
-packBigData = []
+directory = f'sim_{datetime.now().strftime("%y-%m-%d-%H-%M-%S")}'
+exists_path(directory)
 
-# TODO: save in file (one file per vehicle/user) the lat, lon and timestamp
-# TODO: traffic light data??
 while traci.simulation.getMinExpectedNumber() > 0:
 
     traci.simulationStep()
@@ -36,35 +40,18 @@ while traci.simulation.getMinExpectedNumber() > 0:
     vehicles = traci.vehicle.getIDList()
 
     for i in range(0, len(vehicles)):
-
-        # Function descriptions
-        # https://sumo.dlr.de/docs/TraCI/Vehicle_Value_Retrieval.html
-        # https://sumo.dlr.de/pydoc/traci._vehicle.html#VehicleDomain-getSpeed
         vehid = vehicles[i]
         x, y = traci.vehicle.getPosition(vehicles[i])
         lon, lat = traci.simulation.convertGeo(x, y)
 
-        # Packing of all the data for export to CSV/XLSX
-        vehicle_record = [lat, lon, get_datetime()]
+        record = [lat, lon, get_datetime()]
 
-        print('Vehicle: ', vehicles[i], ' at datetime: ', get_datetime())
+        vehicle_file = os.path.join(directory, f'{vehid}.csv')
 
-        # Pack Simulated Data
-        packBigDataLine = flatten_list(vehicle_record)
-        packBigData.append(packBigDataLine)
+        with open(vehicle_file, 'a', newline='') as file_csv:
+            writer = csv.writer(file_csv)
+            writer.writerow(record)
 
-        # ----------MACHINE LEARNING CODES/FUNCTIONS HERE---------- #
-
-        # --------------------------------------------------------------- #
-
-        # ----------CONTROL Vehicles and Traffic Lights---------- #
-
-        # ***SET FUNCTION FOR VEHICLES***
-        # REF: https://sumo.dlr.de/docs/TraCI/Change_Vehicle_State.html
 
 traci.close()
-
-# Generate Excel file
-dataset = pd.DataFrame(packBigData)
-dataset.to_csv('output.csv', index=False, header=False)
 time.sleep(5)
