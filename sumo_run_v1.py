@@ -1,37 +1,20 @@
-import csv
 import os
+import sys
 import time
 import traci
 
-from datetime import datetime
+# the three lines bellow are responsible for adding the parent directory to the sys.path
+# and import modules from different directories.
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.join(current_dir, "..")
+sys.path.append(parent_dir)
 
-
-def exists_path(name):
-    if not os.path.exists(name):
-        os.makedirs(name)
-
-
-def get_datetime():
-    epoch_time = int(time.time())
-    return epoch_time
-
-
-def flatten_list(_2d_list):
-    flat_list = []
-    for element in _2d_list:
-        if type(element) is list:
-            for item in element:
-                flat_list.append(item)
-        else:
-            flat_list.append(element)
-    return flat_list
-
+from components.sim_recorder import SimRecorder
 
 sumoCmd = ['sumo', '-c', 'osm.sumocfg']
 traci.start(sumoCmd)
 
-directory = f'sim_{datetime.now().strftime("%y-%m-%d-%H-%M-%S")}'
-exists_path(directory)
+recorder = SimRecorder()
 
 while traci.simulation.getMinExpectedNumber() > 0:
 
@@ -39,19 +22,7 @@ while traci.simulation.getMinExpectedNumber() > 0:
 
     vehicles = traci.vehicle.getIDList()
 
-    for i in range(0, len(vehicles)):
-        vehid = vehicles[i]
-        x, y = traci.vehicle.getPosition(vehicles[i])
-        lon, lat = traci.simulation.convertGeo(x, y)
-
-        record = [lat, lon, get_datetime()]
-
-        vehicle_file = os.path.join(directory, f'{vehid}.csv')
-
-        with open(vehicle_file, 'a', newline='') as file_csv:
-            writer = csv.writer(file_csv)
-            writer.writerow(record)
-
+    recorder.write_trace(vehicles)
 
 traci.close()
 time.sleep(5)
