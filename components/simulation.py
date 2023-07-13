@@ -20,6 +20,8 @@ class Simulation:
             os.makedirs(self.sim_mobility_output)
 
         self.sumoCmd = ['sumo', '-c', f'{self.scenario_path}/osm.sumocfg']
+        self.initial_time = self.get_epoch_time()
+        self.run()
 
     @staticmethod
     def get_epoch_time():
@@ -54,7 +56,7 @@ class Simulation:
             x, y = traci.vehicle.getPosition(vehicles[i])
             lon, lat = traci.simulation.convertGeo(x, y)
 
-            record = [lat, lon, self.get_epoch_time()]
+            record = [lat, lon, self.get_epoch_time() - self.initial_time]
 
             vehicle_csv_file = os.path.join(self.sim_mobility_output, f'{vehid}.csv')
 
