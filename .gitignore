@@ -4,3 +4,7 @@
 components/__pycache__/
 
 CommunitiesIdentificationThroughFL/
+
+FLPUCI/utils/__pycache__/
+
+FLPUCI/pre_processing/__pycache__/
