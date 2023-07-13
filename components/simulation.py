@@ -24,8 +24,8 @@ class Simulation:
         if not os.path.exists(self.sim_mobility_output):
             os.makedirs(self.sim_mobility_output)
 
-        sumoCmd = ['sumo', '-c', f'{scenario_path}/osm.sumocfg']
-        traci.start(sumoCmd)
+        self.sumoCmd = ['sumo', '-c', f'{scenario_path}/osm.sumocfg']
+
 
     def get_epoch_time(self):
         """
@@ -53,6 +53,7 @@ class Simulation:
         writes the current position of a moving object in its respective simulation file
         :param vehicles: the vehicles moving
         """
+        traci.start(self.sumoCmd)
         for i in range(0, len(vehicles)):
             vehid = vehicles[i]
             x, y = traci.vehicle.getPosition(vehicles[i])
