@@ -1,5 +1,7 @@
 from components.simulation import Simulation, arguments
 
-scenario_path = arguments().scenario_path
+args = arguments()
+scenario_path = args.scenario_path
+simulation_time = args.simulation_time
 
-Simulation(scenario_path).run()
+Simulation(scenario_path, simulation_time)
