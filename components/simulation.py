@@ -3,6 +3,7 @@ import csv
 import time
 import argparse
 import traci
+import sumolib
 
 from datetime import datetime
 
@@ -10,21 +11,24 @@ from FLPUCI.pre_processing.sample_generation import FeatureMatrix
 
 
 class Simulation:
-    def __init__(self, scenario_path, simulation_time, window_size):
+    def __init__(self, args):
         """
         Instantiates and starts a simulation, exporting raw mobility data of each moving object to its respective file.
         It creates one directory for each simulation round, identified by yyyy-mm-dd-H-M-S
         """
-        self.scenario_path = scenario_path
+        self.scenario_path = args.scenario_path
         self.trace_path = f'{self.scenario_path}/sim_{datetime.now().strftime("%y-%m-%d-%H-%M-%S")}'
 
         if not os.path.exists(self.trace_path):
             os.makedirs(self.trace_path)
 
-        self.simulation_time = simulation_time
-        self.window_size = window_size
+        self.simulation_time = args.simulation_time
+        self.window_size = args.window_size
+        self.resolution = args.cell_resolution
 
         self.sumoCmd = ['sumo', '-c', f'{self.scenario_path}/osm.sumocfg']
+        self.net = sumolib.net.readNet(f'{self.scenario_path}/osm.net.xml.gz')
+
         self.run()
 
     def run(self):
@@ -33,7 +37,7 @@ class Simulation:
         """
         traci.start(self.sumoCmd)
 
-        fm = FeatureMatrix(self.trace_path)
+        fm = FeatureMatrix(self.trace_path, self.window_size, self.resolution, boundary=self.net.getBoundary())
         current_window = 0
 
         while traci.simulation.getMinExpectedNumber() > 0 and traci.simulation.getTime() < self.simulation_time:
@@ -42,6 +46,7 @@ class Simulation:
             vehicles = traci.vehicle.getIDList()
 
             if traci.simulation.getTime() % self.window_size == 0:
+                fm.new_record(current_window)
                 current_window += 1
 
             self.write_trace(vehicles, current_window)
@@ -71,7 +76,8 @@ def arguments():
     parser = argparse.ArgumentParser(description='Required arguments to run SUMO simulations')
     parser.add_argument('--scenario_path', type=str, default='2023-07-13-15-23-35', help='The relative path of the '
                                                                                          'scenario')
-    parser.add_argument('--simulation_time', type=int, default='7200', help='The simulation time duration')
-    parser.add_argument('--window_size', type=int, default='60', help='The time window size to generate mobility '
+    parser.add_argument('--simulation_time', type=int, default=7200, help='The simulation time duration')
+    parser.add_argument('--window_size', type=int, default=10, help='The time window size to generate mobility '
                                                                      'samples')
+    parser.add_argument('--cell_resolution', type=int, default=50, help='The cell resolution')
     return parser.parse_args()
