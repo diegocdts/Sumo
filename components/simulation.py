@@ -6,6 +6,8 @@ import traci
 
 from datetime import datetime
 
+from FLPUCI.pre_processing.sample_generation import FeatureMatrix
+
 
 class Simulation:
     def __init__(self, scenario_path, simulation_time, window_size):
@@ -31,6 +33,7 @@ class Simulation:
         """
         traci.start(self.sumoCmd)
 
+        fm = FeatureMatrix(self.trace_path)
         current_window = 0
 
         while traci.simulation.getMinExpectedNumber() > 0 and traci.simulation.getTime() < self.simulation_time:
