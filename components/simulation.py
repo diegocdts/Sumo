@@ -4,7 +4,7 @@ import time
 import argparse
 import traci
 
-from FLPUCI.pre_processing.sample_generation import FeatureMatrix
+from FLPUCI.pre_processing.sample_generation import FeatureMatrix, SampleHandler
 from components.settings import SimulationSettings
 
 
@@ -17,6 +17,7 @@ class Simulation:
         self.settings = settings
 
         self.fm = FeatureMatrix(settings)
+        self.sample_handler = SampleHandler(settings)
 
         self.run()
 

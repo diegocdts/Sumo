@@ -96,17 +96,6 @@ def reshape(pixels: np.array):
     return pixels
 
 
-def get_samples(file_path: str, start_window: int, end_window: int):
-    samples = []
-    with open(file_path) as file:
-        windows = file.readlines()[start_window:end_window]
-        for window in windows:
-            sample = np.array(window.split(','), dtype="float64")
-            sample = handle_pixels(sample)
-            samples.append(sample)
-    return reshape(np.array(samples))
-
-
 class SampleHandler:
 
     def __init__(self, settings: SimulationSettings):
@@ -117,18 +106,31 @@ class SampleHandler:
         datasets = []
         for index, file_name in enumerate(sorted_files(self.settings.fm_path)):
             file_path = get_file_path(self.settings.fm_path, file_name)
-            user_samples = get_samples(file_path, start_window, end_window)
+            user_samples = self.get_samples(file_path, start_window, end_window)
             if len(user_samples) > 0:
                 indices.append(index)
                 datasets.append(user_samples)
         return np.array(datasets), np.array(indices)
+
+    def get_samples(self, file_path: str, start_window: int, end_window: int):
+        samples = []
+        with open(file_path) as file:
+            windows = file.readlines()[start_window:end_window]
+            for window in windows:
+                sample = np.array(window.split(','), dtype="float64")
+                sample = handle_pixels(sample)
+                sample = sample.reshape(self.settings.width, self.settings.height)
+                if sample.max() > sample.min():
+                    samples.append(sample)
+        samples = np.array(samples)
+        return reshape(samples)
 
     def random_dataset(self):
         def get_random():
             total_users = len(sorted_files(self.settings.fm_path))
             file_name = sorted_files(self.settings.fm_path)[random.randrange(total_users)]
             file_path = get_file_path(self.settings.fm_path, file_name)
-            single_dataset = get_samples(file_path, 0, 1)
+            single_dataset = self.get_samples(file_path, 0, 1)
             return single_dataset
         dataset = get_random()
         return dataset
