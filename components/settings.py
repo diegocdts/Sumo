@@ -14,6 +14,7 @@ def dir_exists_create(dir_name: str):
         os.mkdir(path)
     return path
 
+
 class SimulationSettings:
 
     def __init__(self, args):
@@ -35,4 +36,3 @@ class SimulationSettings:
 
         self.width = int((max_x - min_x) / self.resolution)
         self.height = int((max_y - min_y) / self.resolution)
-
