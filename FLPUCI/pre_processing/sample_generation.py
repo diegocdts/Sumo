@@ -5,7 +5,8 @@ import random
 import numpy as np
 import pandas as pd
 
-from FLPUCI.utils.helpers import sorted_files, get_file_path, dir_exists_create
+from FLPUCI.utils.helpers import sorted_files, get_file_path
+from components.settings import SimulationSettings
 
 
 def logit(cells_list: list):
@@ -21,27 +22,16 @@ def logit(cells_list: list):
 
 class FeatureMatrix:
 
-    def __init__(self, trace_path: str, window_size: int, resolution: int, boundary: list):
-        self.trace_path = trace_path
-        self.fm_path = dir_exists_create(f'{trace_path}_fm')
-
-        self.window_size = window_size
-
-        min_x, min_y = boundary[0], boundary[1]
-        max_x, max_y = boundary[2], boundary[3]
-
-        self.resolution = resolution
-        self.width = int((max_x - min_x) / resolution)
-        self.height = int((max_y - min_y) / resolution)
-
+    def __init__(self, settings: SimulationSettings):
+        self.settings = settings
         self.header = ['win', 'x', 'y', 'time']
 
     def new_record(self, window: int):
-        for file_name in sorted_files(self.trace_path):
-            file_path = get_file_path(self.trace_path, file_name)
+        for file_name in sorted_files(self.settings.trace_path):
+            file_path = get_file_path(self.settings.trace_path, file_name)
             trace_df = pd.read_csv(file_path, names=self.header)
 
-            fm_file_path = get_file_path(self.fm_path, file_name)
+            fm_file_path = get_file_path(self.settings.fm_path, file_name)
             fm_df = self.get_matrix(fm_file_path)
 
             this_window_records = trace_df[trace_df.win == window]
@@ -51,7 +41,7 @@ class FeatureMatrix:
 
     def get_matrix(self, output_file_path: str):
         if not os.path.exists(output_file_path):
-            columns = np.arange(0, self.width * self.height, 1)
+            columns = np.arange(0, self.settings.width * self.settings.height, 1)
             matrix = pd.DataFrame(columns=columns)
             matrix.to_csv(output_file_path, index=False)
         else:
@@ -66,9 +56,9 @@ class FeatureMatrix:
 
             for index, row in this_window_records.iterrows():
                 # cell position calculation
-                x_index = int(row.x / self.resolution)
-                y_index = int(row.y / self.resolution)
-                cell = (x_index * self.height) + y_index
+                x_index = int(row.x / self.settings.resolution)
+                y_index = int(row.y / self.settings.resolution)
+                cell = (x_index * self.settings.height) + y_index
 
                 # time a node spends in a cell
                 delta_time = row.time - previous_time
@@ -82,7 +72,7 @@ class FeatureMatrix:
         output_file.write(cell_stay_time)
 
     def normalize_by_window_size(self, cell_stay_time: np.array):
-        cells_stay_time_logit = logit([item / self.window_size for item in cell_stay_time])
+        cells_stay_time_logit = logit([item / self.settings.window_size for item in cell_stay_time])
         cells_stay_time_str = ', '.join([str(item) for item in cells_stay_time_logit]) + '\n'
         return cells_stay_time_str
 
@@ -119,16 +109,14 @@ def get_samples(file_path: str, start_window: int, end_window: int):
 
 class SampleHandler:
 
-    def __init__(self, fm_path: str, width: int, height: int):
-        self.fm_path = fm_path
-        self.width = width
-        self.height = height
+    def __init__(self, settings: SimulationSettings):
+        self.settings = settings
 
     def get_datasets(self, start_window: int, end_window: int):
         indices = []
         datasets = []
-        for index, file_name in enumerate(sorted_files(self.fm_path)):
-            file_path = get_file_path(self.fm_path, file_name)
+        for index, file_name in enumerate(sorted_files(self.settings.fm_path)):
+            file_path = get_file_path(self.settings.fm_path, file_name)
             user_samples = get_samples(file_path, start_window, end_window)
             if len(user_samples) > 0:
                 indices.append(index)
@@ -137,11 +125,10 @@ class SampleHandler:
 
     def random_dataset(self):
         def get_random():
-            total_users = len(sorted_files(self.fm_path))
-            file_name = sorted_files(self.fm_path)[random.randrange(total_users)]
-            file_path = get_file_path(self.fm_path, file_name)
+            total_users = len(sorted_files(self.settings.fm_path))
+            file_name = sorted_files(self.settings.fm_path)[random.randrange(total_users)]
+            file_path = get_file_path(self.settings.fm_path, file_name)
             single_dataset = get_samples(file_path, 0, 1)
             return single_dataset
         dataset = get_random()
         return dataset
-

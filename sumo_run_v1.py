@@ -1,5 +1,7 @@
+from components.settings import SimulationSettings
 from components.simulation import Simulation, arguments
 
 args = arguments()
 
-Simulation(args)
+settings = SimulationSettings(args)
+Simulation(settings)
