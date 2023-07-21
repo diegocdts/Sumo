@@ -5,10 +5,19 @@ import sumolib
 
 
 def run_id():
+    """
+    defines a simulation identifier for naming the trace output directory
+    :return: the simulation identifier
+    """
     return f'sim_{datetime.now().strftime("%y-%m-%d-%H-%M-%S")}'
 
 
 def dir_exists_create(dir_name: str):
+    """
+    checks if a path exists. If not, then creates the path and returns it
+    :param dir_name: path to be checked
+    :return: path created
+    """
     path = os.path.join(os.path.normpath(os.getcwd()), dir_name)
     if not os.path.exists(path):
         os.mkdir(path)
@@ -18,6 +27,30 @@ def dir_exists_create(dir_name: str):
 class SimulationSettings:
 
     def __init__(self, args):
+        """
+        Instantiates an object that contains all relevant information for the mobility simulation, such as:
+
+        - scenario_path: the path for the files that describe a scenario
+
+        - trace_path: the path for the trace output directory
+
+        - fm_path: the path for the feature matrices directory
+
+        - simulation_time: the duration of the simulation
+
+        - window_size: the number of seconds to compose a window (temporal resolution)
+
+        - resolution: the cell resolution (spatial resolution)
+
+        - sumoCmd: access to the osm.sumocfg simulation file
+
+        - net: access to the osm.net.xml.gz simulation file
+
+        - width: cells width
+
+        - height: cells height
+        :param args: parsed arguments
+        """
         self.scenario_path = args.scenario_path
         self.trace_path = dir_exists_create(f'{self.scenario_path}/{run_id()}')
         self.fm_path = dir_exists_create(f'{self.trace_path}_fm')
