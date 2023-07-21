@@ -40,6 +40,7 @@ class Simulation:
 
             if self.window_changed():   # performs the computation when the window changes
                 self.dm.new_record(current_window)  # creates fills a displacement matrix for the current window
+                self.federated_learning(current_window)
                 current_window += 1
 
             self.write_trace(vehicles, current_window)  # writes a new trace record (register the vehicles position)
@@ -79,6 +80,10 @@ class Simulation:
             with open(vehicle_csv_file, 'a', newline='') as file_csv:
                 writer = csv.writer(file_csv)
                 writer.writerow(record)
+
+    def federated_learning(self, current_window: int):
+        if current_window > 5:
+            self.ffcae.training(start_window=current_window - 5, end_window=current_window)
 
 
 def arguments():
