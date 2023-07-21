@@ -42,6 +42,8 @@ class SimulationSettings:
 
         - spatial_resolution: the cell resolution (spatial resolution)
 
+        - window_size: the number of intervals inside a window
+
         - sumoCmd: access to the osm.sumocfg simulation file
 
         - net: access to the osm.net.xml.gz simulation file
@@ -58,6 +60,7 @@ class SimulationSettings:
         self.simulation_time = args.simulation_time
         self.temporal_resolution = args.temporal_resolution
         self.spatial_resolution = args.spatial_resolution
+        self.window_size = args.window_size
 
         self.sumoCmd = ['sumo', '-c', f'{self.scenario_path}/osm.sumocfg']
         self.net = sumolib.net.readNet(f'{self.scenario_path}/osm.net.xml.gz')
