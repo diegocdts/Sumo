@@ -95,6 +95,6 @@ def arguments():
     parser.add_argument('--scenario_path', type=str, default='2023-07-13-15-23-35', help='The relative path of the '
                                                                                          'scenario')
     parser.add_argument('--simulation_time', type=int, default=7200, help='The simulation time duration')
-    parser.add_argument('--temporal_resolution', type=int, default=10, help='The time window size to generate mobility samples')
+    parser.add_argument('--temporal_resolution', type=int, default=10, help='The interval to generate mobility samples')
     parser.add_argument('--spatial_resolution', type=int, default=50, help='The cell resolution')
     return parser.parse_args()
