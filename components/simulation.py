@@ -4,7 +4,7 @@ import time
 import argparse
 import traci
 
-from FLPUCI.pre_processing.sample_generation import FeatureMatrix, SampleHandler
+from FLPUCI.pre_processing.sample_generation import DisplacementMatrix, SampleHandler
 from components.settings import SimulationSettings
 
 
@@ -17,7 +17,7 @@ class Simulation:
         """
         self.settings = settings
 
-        self.fm = FeatureMatrix(settings)
+        self.dm = DisplacementMatrix(settings)
         self.sample_handler = SampleHandler(settings)
 
         self.run()
@@ -36,7 +36,7 @@ class Simulation:
             vehicles = traci.vehicle.getIDList()
 
             if self.window_changed():
-                self.fm.new_record(current_window)
+                self.dm.new_record(current_window)
                 current_window += 1
 
             self.write_trace(vehicles, current_window)

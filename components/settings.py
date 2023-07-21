@@ -34,7 +34,7 @@ class SimulationSettings:
 
         - trace_path: the path for the trace output directory
 
-        - fm_path: the path for the feature matrices directory
+        - dm_path: the path for the feature matrices directory
 
         - simulation_time: the duration of the simulation
 
@@ -53,7 +53,7 @@ class SimulationSettings:
         """
         self.scenario_path = args.scenario_path
         self.trace_path = dir_exists_create(f'{self.scenario_path}/{run_id()}')
-        self.fm_path = dir_exists_create(f'{self.trace_path}_fm')
+        self.dm_path = dir_exists_create(f'{self.trace_path}_dm')
 
         self.simulation_time = args.simulation_time
         self.window_size = args.window_size

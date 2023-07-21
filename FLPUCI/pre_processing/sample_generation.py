@@ -20,7 +20,7 @@ def logit(cells_list: list):
     return cells_list
 
 
-class FeatureMatrix:
+class DisplacementMatrix:
 
     def __init__(self, settings: SimulationSettings):
         self.settings = settings
@@ -31,7 +31,7 @@ class FeatureMatrix:
             file_path = get_file_path(self.settings.trace_path, file_name)
             trace_df = pd.read_csv(file_path, names=self.header)
 
-            fm_file_path = get_file_path(self.settings.fm_path, file_name)
+            fm_file_path = get_file_path(self.settings.dm_path, file_name)
             fm_df = self.get_matrix(fm_file_path)
 
             this_window_records = trace_df[trace_df.win == window]
@@ -104,8 +104,8 @@ class SampleHandler:
     def get_datasets(self, start_window: int, end_window: int):
         indices = []
         datasets = []
-        for index, file_name in enumerate(sorted_files(self.settings.fm_path)):
-            file_path = get_file_path(self.settings.fm_path, file_name)
+        for index, file_name in enumerate(sorted_files(self.settings.dm_path)):
+            file_path = get_file_path(self.settings.dm_path, file_name)
             user_samples = self.get_samples(file_path, start_window, end_window)
             if len(user_samples) > 0:
                 indices.append(index)
@@ -127,9 +127,9 @@ class SampleHandler:
 
     def random_dataset(self):
         def get_random():
-            total_users = len(sorted_files(self.settings.fm_path))
-            file_name = sorted_files(self.settings.fm_path)[random.randrange(total_users)]
-            file_path = get_file_path(self.settings.fm_path, file_name)
+            total_users = len(sorted_files(self.settings.dm_path))
+            file_name = sorted_files(self.settings.dm_path)[random.randrange(total_users)]
+            file_path = get_file_path(self.settings.dm_path, file_name)
             single_dataset = self.get_samples(file_path, 0, 1)
             return single_dataset
         dataset = get_random()
