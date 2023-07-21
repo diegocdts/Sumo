@@ -75,6 +75,29 @@ class FederatedFullConvolutionalAutoEncoder:
             loss=tf.keras.losses.MeanSquaredError()
         )
 
+    def model_evaluation(self, testing_data):
+        return self.evaluator(self.state.model, testing_data)
+
+    def training(self, start_window: int, end_window: int):
+        rounds = self.federated_sample_handler.training_parameters.rounds
+
+        training_data = self.federated_sample_handler.users_data(start_window, end_window)
+
+        for round_num in range(rounds):
+            print('start: {} | end: {} | round: {}'.format(start_window, end_window, round_num))
+            round_iteration = self.iterative_process.next(self.state, training_data)
+            self.state = round_iteration[0]
+            self.manager.save_checkpoint(self.state, round_num)
+
+    def encoder_prediction(self, start_window: int, end_window: int):
+        samples, indices_list = self.federated_sample_handler.sample_handler.list_samples(start_window, end_window)
+        keras_model = model_build(self.properties)
+        self.state.model.assign_weights_to(keras_model)
+        encoder = get_trained_encoder(keras_model)
+        predictions = encoder.predict(samples)
+        del samples, encoder
+        return predictions, indices_list
+
 
 def model_build(fcaep: FCAEProperties):
     encoder = encoder_build(fcaep)
@@ -118,3 +141,7 @@ def dense_nodes_width_height(fcaep: FCAEProperties):
         height = height / 2
     dense_nodes = int(width * height * fcaep.encode_layers[-1])
     return dense_nodes, int(width), int(height)
+
+
+def get_trained_encoder(model: tf.keras.Model):
+    return tf.keras.models.Model(model.input, model.layers[-2].output)
