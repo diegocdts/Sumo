@@ -82,8 +82,8 @@ class Simulation:
                 writer.writerow(record)
 
     def federated_learning(self, current_interval: int):
-        if current_interval > 5:
-            self.ffcae.training(start_window=current_interval - 5, end_window=current_interval)
+        if current_interval >= self.settings.window_size:
+            self.ffcae.training(start_window=current_interval - self.settings.window_size, end_window=current_interval)
 
 
 def arguments():
