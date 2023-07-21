@@ -5,7 +5,7 @@ import argparse
 import traci
 
 from FLPUCI.pre_processing.sample_generation import DisplacementMatrix
-from FLPUCI.model.autoencoder import FederatedFullConvolutionalAutoEncoder as FFCAE
+from FLPUCI.model.autoencoder import FederatedFullConvolutionalAutoEncoder as ffcae
 from FLPUCI.utils.props import FCAEProperties, TrainingParameters
 from components.settings import SimulationSettings
 
@@ -20,7 +20,7 @@ class Simulation:
         self.settings = settings
 
         self.dm = DisplacementMatrix(settings)
-        self.ffcae = FFCAE(settings, parameters, properties)
+        self.ffcae = ffcae(settings, parameters, properties)
 
         self.run()
 
@@ -30,7 +30,7 @@ class Simulation:
         """
         traci.start(self.settings.sumoCmd)  # starts the simulation
 
-        current_window = 0  # initiates the window controller
+        current_interval = 0  # initiates the interval controller
 
         while self.condition_to_run():  # keeps the simulation running
 
@@ -39,11 +39,11 @@ class Simulation:
             vehicles = traci.vehicle.getIDList()    # gets the id list of vehicles
 
             if self.window_changed():   # performs the computation when the window changes
-                self.dm.new_record(current_window)  # creates fills a displacement matrix for the current window
-                self.federated_learning(current_window)
-                current_window += 1
+                self.dm.new_record(current_interval)  # creates fills a displacement matrix for the current interval
+                self.federated_learning(current_interval)
+                current_interval += 1
 
-            self.write_trace(vehicles, current_window)  # writes a new trace record (register the vehicles position)
+            self.write_trace(vehicles, current_interval)  # writes a new trace record (register the vehicles position)
 
         traci.close()
         time.sleep(5)
@@ -63,17 +63,17 @@ class Simulation:
         """
         return traci.simulation.getTime() % self.settings.temporal_resolution == 0
 
-    def write_trace(self, vehicles, current_window):
+    def write_trace(self, vehicles, current_interval):
         """
         writes the current position of a moving object in its respective simulation file
         :param vehicles: the moving vehicles
-        :param current_window: the current window during simulation
+        :param current_interval: the current interval during simulation
         """
         for i in range(0, len(vehicles)):
             vehid = vehicles[i]
             x, y = traci.vehicle.getPosition(vehicles[i])
 
-            record = [current_window, x, y, traci.simulation.getTime()]
+            record = [current_interval, x, y, traci.simulation.getTime()]
 
             vehicle_csv_file = os.path.join(self.settings.trace_path, f'{vehid}.csv')
 
@@ -81,9 +81,9 @@ class Simulation:
                 writer = csv.writer(file_csv)
                 writer.writerow(record)
 
-    def federated_learning(self, current_window: int):
-        if current_window > 5:
-            self.ffcae.training(start_window=current_window - 5, end_window=current_window)
+    def federated_learning(self, current_interval: int):
+        if current_interval > 5:
+            self.ffcae.training(start_window=current_interval - 5, end_window=current_interval)
 
 
 def arguments():

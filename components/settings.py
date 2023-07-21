@@ -38,7 +38,7 @@ class SimulationSettings:
 
         - simulation_time: the duration of the simulation
 
-        - temporal_resolution: the number of seconds to compose a window (temporal resolution)
+        - temporal_resolution: the time interval for a sample (temporal resolution)
 
         - resolution: the cell resolution (spatial resolution)
 

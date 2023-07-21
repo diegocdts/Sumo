@@ -26,7 +26,7 @@ class DisplacementMatrix:
         self.settings = settings
         self.header = ['win', 'x', 'y', 'time']
 
-    def new_record(self, window: int):
+    def new_record(self, interval: int):
         for file_name in sorted_files(self.settings.trace_path):
             file_path = get_file_path(self.settings.trace_path, file_name)
             trace_df = pd.read_csv(file_path, names=self.header)
@@ -34,8 +34,8 @@ class DisplacementMatrix:
             fm_file_path = get_file_path(self.settings.dm_path, file_name)
             fm_df = self.get_matrix(fm_file_path)
 
-            this_window_records = trace_df[trace_df.win == window]
-            copy = this_window_records.copy().reset_index()
+            this_interval_records = trace_df[trace_df.win == interval]
+            copy = this_interval_records.copy().reset_index()
 
             self.fill_record(copy, fm_df, fm_file_path)
 
@@ -48,13 +48,13 @@ class DisplacementMatrix:
             matrix = pd.read_csv(output_file_path)
         return matrix
 
-    def fill_record(self, this_window_records: pd.DataFrame, fm_df: pd.DataFrame, output_file_path: str):
+    def fill_record(self, this_interval_records: pd.DataFrame, fm_df: pd.DataFrame, output_file_path: str):
         cell_stay_time = np.zeros(len(fm_df.columns))
 
-        if len(this_window_records) > 0:
-            previous_time = this_window_records.time[0] - 1
+        if len(this_interval_records) > 0:
+            previous_time = this_interval_records.time[0] - 1
 
-            for index, row in this_window_records.iterrows():
+            for index, row in this_interval_records.iterrows():
                 # cell position calculation
                 x_index = int(row.x / self.settings.resolution)
                 y_index = int(row.y / self.settings.resolution)
@@ -115,9 +115,9 @@ class SampleHandler:
     def get_samples(self, file_path: str, start_window: int, end_window: int):
         samples = []
         with open(file_path) as file:
-            windows = file.readlines()[start_window:end_window]
-            for window in windows:
-                sample = np.array(window.split(','), dtype="float64")
+            intervals = file.readlines()[start_window:end_window]
+            for interval in intervals:
+                sample = np.array(interval.split(','), dtype="float64")
                 sample = handle_pixels(sample)
                 sample = sample.reshape(self.settings.width, self.settings.height)
                 if sample.max() > sample.min():
