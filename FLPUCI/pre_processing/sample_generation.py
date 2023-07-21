@@ -67,12 +67,12 @@ class DisplacementMatrix:
                 previous_time = row.time
 
             # appends feature_row at the matrix
-        cell_stay_time = self.normalize_by_window_size(cell_stay_time)
+        cell_stay_time = self.normalize_by_temporal_resolution(cell_stay_time)
         output_file = open(output_file_path, 'a')
         output_file.write(cell_stay_time)
 
-    def normalize_by_window_size(self, cell_stay_time: np.array):
-        cells_stay_time_logit = logit([item / self.settings.window_size for item in cell_stay_time])
+    def normalize_by_temporal_resolution(self, cell_stay_time: np.array):
+        cells_stay_time_logit = logit([item / self.settings.temporal_resolution for item in cell_stay_time])
         cells_stay_time_str = ', '.join([str(item) for item in cells_stay_time_logit]) + '\n'
         return cells_stay_time_str
 

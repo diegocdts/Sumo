@@ -38,7 +38,7 @@ class SimulationSettings:
 
         - simulation_time: the duration of the simulation
 
-        - window_size: the number of seconds to compose a window (temporal resolution)
+        - temporal_resolution: the number of seconds to compose a window (temporal resolution)
 
         - resolution: the cell resolution (spatial resolution)
 
@@ -56,8 +56,8 @@ class SimulationSettings:
         self.dm_path = dir_exists_create(f'{self.trace_path}_dm')
 
         self.simulation_time = args.simulation_time
-        self.window_size = args.window_size
-        self.resolution = args.cell_resolution
+        self.temporal_resolution = args.temporal_resolution
+        self.resolution = args.spatial_resolution
 
         self.sumoCmd = ['sumo', '-c', f'{self.scenario_path}/osm.sumocfg']
         self.net = sumolib.net.readNet(f'{self.scenario_path}/osm.net.xml.gz')
