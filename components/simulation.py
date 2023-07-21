@@ -4,12 +4,14 @@ import time
 import argparse
 import traci
 
-from FLPUCI.pre_processing.sample_generation import DisplacementMatrix, SampleHandler
+from FLPUCI.pre_processing.sample_generation import DisplacementMatrix
+from FLPUCI.model.autoencoder import FederatedFullConvolutionalAutoEncoder as FFCAE
+from FLPUCI.utils.props import FCAEProperties, TrainingParameters
 from components.settings import SimulationSettings
 
 
 class Simulation:
-    def __init__(self, settings: SimulationSettings):
+    def __init__(self, settings: SimulationSettings, parameters: TrainingParameters, properties: FCAEProperties):
         """
         Instantiates and starts a simulation, exporting raw mobility data of each moving object to its respective file.
         It creates one directory for each simulation round, identified by yyyy-mm-dd-H-M-S
@@ -18,7 +20,7 @@ class Simulation:
         self.settings = settings
 
         self.dm = DisplacementMatrix(settings)
-        self.sample_handler = SampleHandler(settings)
+        self.ffcae = FFCAE(settings, parameters, properties)
 
         self.run()
 
