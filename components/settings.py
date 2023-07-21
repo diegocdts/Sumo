@@ -40,7 +40,7 @@ class SimulationSettings:
 
         - temporal_resolution: the time interval for a sample (temporal resolution)
 
-        - resolution: the cell resolution (spatial resolution)
+        - spatial_resolution: the cell resolution (spatial resolution)
 
         - sumoCmd: access to the osm.sumocfg simulation file
 
@@ -57,7 +57,7 @@ class SimulationSettings:
 
         self.simulation_time = args.simulation_time
         self.temporal_resolution = args.temporal_resolution
-        self.resolution = args.spatial_resolution
+        self.spatial_resolution = args.spatial_resolution
 
         self.sumoCmd = ['sumo', '-c', f'{self.scenario_path}/osm.sumocfg']
         self.net = sumolib.net.readNet(f'{self.scenario_path}/osm.net.xml.gz')
@@ -67,5 +67,5 @@ class SimulationSettings:
         min_x, min_y = boundary[0], boundary[1]
         max_x, max_y = boundary[2], boundary[3]
 
-        self.width = int((max_x - min_x) / self.resolution)
-        self.height = int((max_y - min_y) / self.resolution)
+        self.width = int((max_x - min_x) / self.spatial_resolution)
+        self.height = int((max_y - min_y) / self.spatial_resolution)

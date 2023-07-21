@@ -56,8 +56,8 @@ class DisplacementMatrix:
 
             for index, row in this_interval_records.iterrows():
                 # cell position calculation
-                x_index = int(row.x / self.settings.resolution)
-                y_index = int(row.y / self.settings.resolution)
+                x_index = int(row.x / self.settings.spatial_resolution)
+                y_index = int(row.y / self.settings.spatial_resolution)
                 cell = (x_index * self.settings.height) + y_index
 
                 # time a node spends in a cell
