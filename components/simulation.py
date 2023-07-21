@@ -26,20 +26,21 @@ class Simulation:
         """
         runs a mobility simulation
         """
-        traci.start(self.settings.sumoCmd)
+        traci.start(self.settings.sumoCmd)  # starts the simulation
 
-        current_window = 0
+        current_window = 0  # initiates the window controller
 
-        while self.condition_to_run():
-            traci.simulationStep()
+        while self.condition_to_run():  # keeps the simulation running
 
-            vehicles = traci.vehicle.getIDList()
+            traci.simulationStep()  # makes a simulation step
 
-            if self.window_changed():
-                self.dm.new_record(current_window)
+            vehicles = traci.vehicle.getIDList()    # gets the id list of vehicles
+
+            if self.window_changed():   # performs the computation when the window changes
+                self.dm.new_record(current_window)  # creates fills a displacement matrix for the current window
                 current_window += 1
 
-            self.write_trace(vehicles, current_window)
+            self.write_trace(vehicles, current_window)  # writes a new trace record (register the vehicles position)
 
         traci.close()
         time.sleep(5)
