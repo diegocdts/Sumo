@@ -32,7 +32,7 @@ class FederatedSampleHandler:
         return preprocessed.element_spec
 
     def users_data(self, start_window: int, end_window: int):
-        users_dataset_samples, indices_list = self.sample_handler.get_datasets(start_window, end_window)
+        users_dataset_samples, indices = self.sample_handler.get_datasets(start_window, end_window)
         federated_dataset_samples = []
 
         for dataset in users_dataset_samples:
@@ -90,13 +90,13 @@ class FederatedFullConvolutionalAutoEncoder:
             self.manager.save_checkpoint(self.state, round_num)
 
     def encoder_prediction(self, start_window: int, end_window: int):
-        samples, indices_list = self.federated_sample_handler.sample_handler.list_samples(start_window, end_window)
+        samples, indices = self.federated_sample_handler.sample_handler.samples_as_list(start_window, end_window)
         keras_model = model_build(self.properties)
         self.state.model.assign_weights_to(keras_model)
         encoder = get_trained_encoder(keras_model)
         predictions = encoder.predict(samples)
         del samples, encoder
-        return predictions, indices_list
+        return predictions, indices
 
 
 def model_build(fcaep: FCAEProperties):

@@ -134,3 +134,11 @@ class SampleHandler:
             return single_dataset
         dataset = get_random()
         return dataset
+
+    def samples_as_list(self, start_window: int, end_window: int):
+        datasets, indices = self.get_datasets(start_window, end_window)
+        samples = []
+        for dataset in datasets:
+            for sample in dataset:
+                samples.append(sample)
+        return np.array(samples), indices
