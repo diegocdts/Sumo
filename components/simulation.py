@@ -13,6 +13,7 @@ class Simulation:
         """
         Instantiates and starts a simulation, exporting raw mobility data of each moving object to its respective file.
         It creates one directory for each simulation round, identified by yyyy-mm-dd-H-M-S
+        :param settings a SimulationSettings object that contains all relevant information for the mobility simulation
         """
         self.settings = settings
 
@@ -23,19 +24,18 @@ class Simulation:
 
     def run(self):
         """
-        runs a simulation
+        runs a mobility simulation
         """
         traci.start(self.settings.sumoCmd)
 
         current_window = 0
 
-        while traci.simulation.getMinExpectedNumber() > 0 \
-                and traci.simulation.getTime() < self.settings.simulation_time:
+        while self.condition_to_run():
             traci.simulationStep()
 
             vehicles = traci.vehicle.getIDList()
 
-            if traci.simulation.getTime() % self.settings.window_size == 0:
+            if self.window_changed():
                 self.fm.new_record(current_window)
                 current_window += 1
 
@@ -44,10 +44,25 @@ class Simulation:
         traci.close()
         time.sleep(5)
 
+    def condition_to_run(self):
+        """
+        specifies the condition to run a mobility simulation
+        :return: True if the traci.simulation.getTime() achieved the self.settings.simulation_time. False otherwise
+        """
+        return traci.simulation.getMinExpectedNumber() > 0 \
+            and traci.simulation.getTime() < self.settings.simulation_time
+
+    def window_changed(self):
+        """
+        specifies the window changing condition
+        :return: True if traci.simulation.getTime() module self.settings.window_size equals zero. False otherwise
+        """
+        return traci.simulation.getTime() % self.settings.window_size == 0
+
     def write_trace(self, vehicles, current_window):
         """
         writes the current position of a moving object in its respective simulation file
-        :param vehicles: the vehicles moving
+        :param vehicles: the moving vehicles
         :param current_window: the current window during simulation
         """
         for i in range(0, len(vehicles)):
@@ -64,6 +79,10 @@ class Simulation:
 
 
 def arguments():
+    """
+    sets the required arguments to run SUMO simulations
+    :return: the parsed arguments
+    """
     parser = argparse.ArgumentParser(description='Required arguments to run SUMO simulations')
     parser.add_argument('--scenario_path', type=str, default='2023-07-13-15-23-35', help='The relative path of the '
                                                                                          'scenario')
