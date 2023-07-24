@@ -24,6 +24,18 @@ def dir_exists_create(dir_name: str):
     return path
 
 
+def even_dimension(dimension: int):
+    """
+    adds one unit to the dimension if it is odd
+    :param dimension: dimension to be checked
+    :return: an even dimension
+    """
+    if dimension % 2 == 0:
+        return dimension
+    else:
+        return dimension + 1
+
+
 class SimulationSettings:
 
     def __init__(self, args):
@@ -70,5 +82,5 @@ class SimulationSettings:
         min_x, min_y = boundary[0], boundary[1]
         max_x, max_y = boundary[2], boundary[3]
 
-        self.width = int((max_x - min_x) / self.spatial_resolution)
-        self.height = int((max_y - min_y) / self.spatial_resolution)
+        self.width = even_dimension(int((max_x - min_x) / self.spatial_resolution))
+        self.height = even_dimension(int((max_y - min_y) / self.spatial_resolution))
