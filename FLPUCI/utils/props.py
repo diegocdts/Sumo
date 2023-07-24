@@ -31,7 +31,7 @@ class FCAEProperties:
         :param kernel_size: size of the kernel
         :param strides: strides step size
         :param padding: padding size
-        :param latent_space: number of unites in the latent space
+        :param latent_space: number of units in the latent space
         :param learning_rate: model learning rate
         :param input_shape: model input shape
         """
