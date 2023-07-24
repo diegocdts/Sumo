@@ -16,6 +16,8 @@ class Simulation:
         Instantiates and starts a simulation, exporting raw mobility data of each moving object to its respective file.
         It creates one directory for each simulation round, identified by yyyy-mm-dd-H-M-S
         :param settings a SimulationSettings object that contains all relevant information for the mobility simulation
+        :param parameters a TrainingParameters object
+        :param properties a FCAEProperties object
         """
         self.settings = settings
 
@@ -82,6 +84,10 @@ class Simulation:
                 writer.writerow(record)
 
     def federated_learning(self, current_interval: int):
+        """
+        performs federated model training
+        :param current_interval: the current interval
+        """
         if current_interval >= self.settings.window_size:
             self.ffcae.training(start_window=current_interval - self.settings.window_size, end_window=current_interval)
 
