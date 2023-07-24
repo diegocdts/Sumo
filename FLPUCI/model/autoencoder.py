@@ -17,6 +17,10 @@ class FederatedSampleHandler:
         """
         self.sample_handler = SampleHandler(settings)
         self.training_parameters = training_parameters
+        self.element_spec = None
+
+
+    def set_element_spec(self):
         self.element_spec = self.element_spec_build()
 
     def preprocess(self, dataset):
@@ -82,6 +86,10 @@ class FederatedFullConvolutionalAutoEncoder:
         self.evaluator = self.build_evaluator()
         self.manager = None
         tff.backends.native.set_local_execution_context(clients_per_thread=100)
+
+    def set_element_spec(self):
+        if not self.federated_sample_handler.element_spec:
+            self.federated_sample_handler.set_element_spec()
 
     def global_model_start(self):
         """

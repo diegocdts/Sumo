@@ -88,6 +88,7 @@ class Simulation:
         performs federated model training
         :param current_interval: the current interval
         """
+        self.ffcae.set_element_spec()
         if current_interval >= self.settings.window_size:
             self.ffcae.training(start_window=current_interval - self.settings.window_size, end_window=current_interval)
 
