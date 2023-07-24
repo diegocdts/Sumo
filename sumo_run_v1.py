@@ -6,10 +6,10 @@ from components.instances import parameters, properties
 
 warnings.filterwarnings("ignore")
 
-args = arguments()
+args = arguments()  # parse arguments
 
-settings = SimulationSettings(args)
+settings = SimulationSettings(args)     # instantiate simulation settings
 
-properties.set_input_shape(settings.width, settings.height)
+properties.set_input_shape(settings.width, settings.height)     # set the samples input shape from scenario
 
-Simulation(settings, parameters, properties)
+Simulation(settings, parameters, properties)    # instantiates and runs one simulation
