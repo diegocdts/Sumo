@@ -10,6 +10,6 @@ args = arguments()  # parse arguments
 
 settings = SimulationSettings(args)     # instantiate simulation settings
 
-properties.set_input_shape(settings.width, settings.height)     # set the samples input shape from scenario
+properties.set_input_shape(settings.width, settings.height)     # set the model input shape from scenario
 
 Simulation(settings, parameters, properties)    # instantiates and runs one simulation
