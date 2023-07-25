@@ -35,13 +35,11 @@ def set_dimension(dimension: int, n_layers: int):
     :return: the size of cells for the dimension
     """
     n_divisions = 2 ** n_layers
-    print('> original > ', dimension)
 
     rest = lambda _dimension, _layers: _dimension / _layers - int(_dimension / _layers)
 
     while rest(dimension, n_divisions) > 0:
         dimension += 1
-    print('> new > ', dimension)
 
     return dimension
 
