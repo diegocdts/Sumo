@@ -8,7 +8,7 @@ warnings.filterwarnings("ignore")
 
 args = arguments()  # parse arguments
 
-settings = SimulationSettings(args)     # instantiate simulation settings
+settings = SimulationSettings(args, properties)     # instantiate simulation settings
 
 properties.set_input_shape(settings.width, settings.height)     # set the model input shape from scenario
 
