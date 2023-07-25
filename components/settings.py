@@ -3,6 +3,8 @@ from datetime import datetime
 
 import sumolib
 
+from FLPUCI.utils.props import FCAEProperties
+
 
 def run_id():
     """
@@ -24,21 +26,29 @@ def dir_exists_create(dir_name: str):
     return path
 
 
-def even_dimension(dimension: int):
+def set_dimension(dimension: int, n_layers: int):
     """
-    adds one unit to the dimension if it is odd
-    :param dimension: dimension to be checked
-    :return: an even dimension
+    adjusts the dimension (width or height) value. It increments the dimension by one cell until it can be divided
+    n_layers times without any rest
+    :param dimension: the dimension (in cells) to be set
+    :param n_layers: the number of encoding layers of the model
+    :return: the size of cells for the dimension
     """
-    if dimension % 2 == 0:
-        return dimension
-    else:
-        return dimension + 1
+    n_divisions = 2 ** n_layers
+    print('> original > ', dimension)
+
+    rest = lambda _dimension, _layers: _dimension / _layers - int(_dimension / _layers)
+
+    while rest(dimension, n_divisions) > 0:
+        dimension += 1
+    print('> new > ', dimension)
+
+    return dimension
 
 
 class SimulationSettings:
 
-    def __init__(self, args):
+    def __init__(self, args, properties: FCAEProperties):
         """
         Instantiates an object that contains all relevant information for the mobility simulation, such as:
 
@@ -79,8 +89,10 @@ class SimulationSettings:
 
         boundary = self.net.getBoundary()
 
+        n_layers = len(properties.encode_layers)
+
         min_x, min_y = boundary[0], boundary[1]
         max_x, max_y = boundary[2], boundary[3]
 
-        self.width = even_dimension(int((max_x - min_x) / self.spatial_resolution))
-        self.height = even_dimension(int((max_y - min_y) / self.spatial_resolution))
+        self.width = set_dimension(dimension=int((max_x - min_x) / self.spatial_resolution), n_layers=n_layers)
+        self.height = set_dimension(dimension=int((max_y - min_y) / self.spatial_resolution), n_layers=n_layers)
