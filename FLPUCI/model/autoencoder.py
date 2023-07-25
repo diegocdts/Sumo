@@ -80,7 +80,6 @@ class FederatedFullConvolutionalAutoEncoder:
 
         self.iterative_process, self.state = self.global_model_start()
         self.evaluator = self.build_evaluator()
-        self.manager = None
         tff.backends.native.set_local_execution_context(clients_per_thread=100)
 
     def global_model_start(self):
@@ -136,7 +135,6 @@ class FederatedFullConvolutionalAutoEncoder:
             print('start: {} | end: {} | round: {}'.format(start_window, end_window, round_num))
             round_iteration = self.iterative_process.next(self.state, training_data)
             self.state = round_iteration[0]
-            self.manager.save_checkpoint(self.state, round_num)
 
     def encoder_prediction(self, start_window: int, end_window: int):
         """
