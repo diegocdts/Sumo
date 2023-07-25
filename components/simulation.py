@@ -20,9 +20,11 @@ class Simulation:
         :param properties a FCAEProperties object
         """
         self.settings = settings
+        self.parameters = parameters
+        self.properties = properties
 
         self.dm = DisplacementMatrix(settings)
-        self.ffcae = ffcae(settings, parameters, properties)
+        self.ffcae = None
 
         self.run()
 
@@ -88,10 +90,11 @@ class Simulation:
         performs federated model training
         :param current_interval: the current interval
         """
-        self.ffcae.set_element_spec()
         if current_interval >= self.settings.window_size:
-            self.ffcae.training(start_window=current_interval - self.settings.window_size, end_window=current_interval)
-
+            if self.ffcae is not None:
+                self.ffcae.training(start_window=current_interval - self.settings.window_size, end_window=current_interval)
+            else:
+                self.ffcae = ffcae(self.settings, self.parameters, self.properties)
 
 def arguments():
     """
@@ -99,7 +102,7 @@ def arguments():
     :return: the parsed arguments
     """
     parser = argparse.ArgumentParser(description='Required arguments to run SUMO simulations')
-    parser.add_argument('--scenario_path', type=str, default='2023-07-24-16-49-21', help='The relative path of the '
+    parser.add_argument('--scenario_path', type=str, default='2023-07-24-22-21-28', help='The relative path of the '
                                                                                          'scenario')
     parser.add_argument('--simulation_time', type=int, default=7200, help='The simulation time duration')
     parser.add_argument('--temporal_resolution', type=int, default=10, help='The interval to generate mobility samples')
