@@ -57,6 +57,7 @@ class FederatedSampleHandler:
 
         for dataset in users_dataset_samples:
             if len(dataset) > 0:
+                dataset = tf.constant(dataset)
                 federated_dataset = tf.data.Dataset.from_tensor_slices(dataset)
                 preprocessed = self.preprocess(federated_dataset)
                 federated_dataset_samples.append(preprocessed)
