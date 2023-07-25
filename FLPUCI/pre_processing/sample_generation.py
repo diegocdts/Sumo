@@ -102,7 +102,7 @@ class DisplacementMatrix:
         :return: the new displacement matrix record normalized
         """
         cells_stay_time_logit = logit([item / self.settings.temporal_resolution for item in cell_stay_time])
-        cells_stay_time_str = ', '.join([str(item) for item in cells_stay_time_logit]) + '\n'
+        cells_stay_time_str = ', '.join(['{:.3f}'.format(item) for item in cells_stay_time_logit]) + '\n'
         return cells_stay_time_str
 
 
