@@ -107,6 +107,7 @@ class FederatedFullConvolutionalAutoEncoder:
         :return: the federated model
         """
         keras_model = model_build(self.properties)
+        #print(keras_model.summary())
         return tff.learning.from_keras_model(
             keras_model=keras_model,
             input_spec=self.federated_sample_handler.element_spec,
@@ -192,7 +193,7 @@ def decoder_build(fcaep: FCAEProperties):
     decoder.add(tf.keras.layers.InputLayer(input_shape=(fcaep.latent_space,)))
 
     decoder.add(tf.keras.layers.Dense(dense_layer, activation=fcaep.decode_activation))
-    decoder.add(tf.keras.layers.Reshape((height, width, fcaep.decode_layers[0])))
+    decoder.add(tf.keras.layers.Reshape((width, height, fcaep.decode_layers[0])))
 
     for layer in fcaep.decode_layers:
         decoder.add(tf.keras.layers.Conv2DTranspose(layer, fcaep.kernel_size, activation=fcaep.decode_activation,
