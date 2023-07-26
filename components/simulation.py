@@ -6,7 +6,7 @@ import traci
 
 from FLPUCI.model.clustering import GaussianMixtureModel
 from FLPUCI.pre_processing.sample_generation import DisplacementMatrix
-from FLPUCI.model.autoencoder import FederatedFullConvolutionalAutoEncoder as ffcae
+from FLPUCI.model.tf.federated_learning import FederatedFullConvolutionalAutoEncoder as ffcae
 from FLPUCI.utils.props import FCAEProperties, TrainingParameters
 from components.settings import SimulationSettings
 
@@ -65,7 +65,8 @@ class Simulation:
     def window_changed(self):
         """
         specifies the window changing condition
-        :return: True if traci.simulation.getTime() module self.settings.temporal_resolution equals zero. False otherwise
+        :return: True if traci.simulation.getTime() module self.settings.temporal_resolution equals zero.
+        False otherwise
         """
         return traci.simulation.getTime() % self.settings.temporal_resolution == 0
 
@@ -111,7 +112,8 @@ def arguments():
     parser.add_argument('--scenario_path', type=str, default='2023-07-26-15-30-18', help='The relative path of the '
                                                                                          'scenario')
     parser.add_argument('--simulation_time', type=int, default=7200, help='The simulation time duration')
-    parser.add_argument('--temporal_resolution', type=int, default=360, help='The interval to generate mobility samples')
+    parser.add_argument('--temporal_resolution', type=int, default=360, help='The interval to generate mobility '
+                                                                             'samples')
     parser.add_argument('--spatial_resolution', type=int, default=150, help='The cell resolution')
     parser.add_argument('--window_size', type=int, default=2, help='The number of intervals inside a window')
     parser.add_argument('--max_communities', type=int, default=10, help='The total number of communities to be tested '
