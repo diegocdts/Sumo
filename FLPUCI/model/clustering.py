@@ -20,7 +20,7 @@ class GaussianMixtureModel:
         best_clusters = None
         best_labels = None
         for k in self.max_communities:
-            if k >= len(input_data):
+            if 1 < len(input_data) <= k:
                 clusters, labels, aic = self.fit(k, input_data)
                 if not best_aic_score or best_aic_score > aic:
                     best_aic_score = aic
