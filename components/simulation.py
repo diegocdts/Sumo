@@ -4,6 +4,7 @@ import time
 import argparse
 import traci
 
+from FLPUCI.model.clustering import GaussianMixtureModel
 from FLPUCI.pre_processing.sample_generation import DisplacementMatrix
 from FLPUCI.model.autoencoder import FederatedFullConvolutionalAutoEncoder as ffcae
 from FLPUCI.utils.props import FCAEProperties, TrainingParameters
@@ -25,6 +26,7 @@ class Simulation:
 
         self.dm = DisplacementMatrix(settings)
         self.ffcae = None
+        self.gmm = GaussianMixtureModel(settings.max_communities)
 
         self.run()
 
@@ -87,14 +89,18 @@ class Simulation:
 
     def federated_learning(self, current_interval: int):
         """
-        performs federated model training
+        performs federated model training and clusters the users of the current interval
         :param current_interval: the current interval
         """
         if current_interval >= self.settings.window_size:
-            if self.ffcae is not None:
-                self.ffcae.training(start_window=current_interval - self.settings.window_size, end_window=current_interval)
-            else:
+            if not self.ffcae:
                 self.ffcae = ffcae(self.settings, self.parameters, self.properties)
+
+            self.ffcae.training(start_window=current_interval - self.settings.window_size, end_window=current_interval)
+            predictions, indices = self.ffcae.encoder_prediction(start_window=current_interval,
+                                                                 end_window=current_interval+1)
+            clusters, labels = self.gmm.best_communities(predictions)
+
 
 def arguments():
     """
@@ -108,4 +114,6 @@ def arguments():
     parser.add_argument('--temporal_resolution', type=int, default=10, help='The interval to generate mobility samples')
     parser.add_argument('--spatial_resolution', type=int, default=50, help='The cell resolution')
     parser.add_argument('--window_size', type=int, default=5, help='The number of intervals inside a window')
+    parser.add_argument('--max_communities', type=int, default=10, help='The total number of communities to be tested '
+                                                                        'by the GaussianMixtureModel')
     return parser.parse_args()

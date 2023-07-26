@@ -71,6 +71,8 @@ class SimulationSettings:
         - width: cells width
 
         - height: cells height
+
+        - max_communities: total number of communities to be tested by the GaussianMixtureModel
         :param args: parsed arguments
         """
         self.scenario_path = args.scenario_path
@@ -94,3 +96,5 @@ class SimulationSettings:
 
         self.width = set_dimension(dimension=int((max_x - min_x) / self.spatial_resolution), n_layers=n_layers)
         self.height = set_dimension(dimension=int((max_y - min_y) / self.spatial_resolution), n_layers=n_layers)
+
+        self.max_communities = args.max_communities
