@@ -134,9 +134,11 @@ class FederatedFullConvolutionalAutoEncoder:
         training_data = self.federated_sample_handler.users_data(start_window, end_window)
 
         for round_num in range(rounds):
-            print('start: {} | end: {} | round: {}'.format(start_window, end_window, round_num))
-            round_iteration = self.iterative_process.next(self.state, training_data)
-            self.state = round_iteration[0]
+            print('start: {} | end: {} | round: {} | training samples clients {}'
+                  .format(start_window, end_window, round_num, len(training_data)))
+            if len(training_data) > 0:
+                round_iteration = self.iterative_process.next(self.state, training_data)
+                self.state = round_iteration[0]
 
     def encoder_prediction(self, start_window: int, end_window: int):
         """
@@ -149,7 +151,10 @@ class FederatedFullConvolutionalAutoEncoder:
         keras_model = model_build(self.properties)
         self.state.model.assign_weights_to(keras_model)
         encoder = get_trained_encoder(keras_model)
-        predictions = encoder.predict(samples)
+        if len(samples) > 0:
+            predictions = encoder.predict(samples)
+        else:
+            predictions = None
         del samples, encoder
         return predictions, indices
 
