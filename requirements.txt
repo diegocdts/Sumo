@@ -7,4 +7,3 @@ matplotlib
 scikit-image
 scikit-learn
 scipy
-torch
