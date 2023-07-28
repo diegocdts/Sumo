@@ -44,7 +44,7 @@ class Simulation:
 
             vehicles = traci.vehicle.getIDList()
 
-            if self.window_changed():   # performs the computation when the window changes
+            if self.interval_changed():   # performs the computation when the interval changes
 
                 self.dm.new_record(self.current_interval)
                 self.federated_learning(self.current_interval)
@@ -63,9 +63,9 @@ class Simulation:
         return traci.simulation.getMinExpectedNumber() > 0 \
             and traci.simulation.getTime() < self.settings.simulation_time
 
-    def window_changed(self):
+    def interval_changed(self):
         """
-        specifies the window changing condition
+        specifies the interval changing condition
         :return: True if traci.simulation.getTime() module self.settings.temporal_resolution equals zero.
         False otherwise
         """
