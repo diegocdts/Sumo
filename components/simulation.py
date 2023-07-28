@@ -28,28 +28,29 @@ class Simulation:
         self.ffcae = None
         self.gmm = GaussianMixtureModel(settings.max_communities)
 
+        self.current_interval = 0  # initiates the interval controller
+
         self.run()
 
     def run(self):
         """
         runs a mobility simulation
         """
-        traci.start(self.settings.sumoCmd)  # starts the simulation
+        traci.start(self.settings.sumoCmd)
 
-        current_interval = 0  # initiates the interval controller
+        while self.condition_to_run():
 
-        while self.condition_to_run():  # keeps the simulation running
+            traci.simulationStep()
 
-            traci.simulationStep()  # makes a simulation step
-
-            vehicles = traci.vehicle.getIDList()    # gets the id list of vehicles
+            vehicles = traci.vehicle.getIDList()
 
             if self.window_changed():   # performs the computation when the window changes
-                self.dm.new_record(current_interval)  # creates fills a displacement matrix for the current interval
-                self.federated_learning(current_interval)
-                current_interval += 1
 
-            self.write_trace(vehicles, current_interval)  # writes a new trace record (register the vehicles position)
+                self.dm.new_record(self.current_interval)
+                self.federated_learning(self.current_interval)
+                self.current_interval += 1
+
+            self.write_trace(vehicles, self.current_interval)
 
         traci.close()
         time.sleep(5)
