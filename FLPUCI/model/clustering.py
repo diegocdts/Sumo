@@ -29,4 +29,5 @@ class GaussianMixtureModel:
                         best_labels = labels
                 else:
                     break
+            del input_data
         return best_clusters, best_labels

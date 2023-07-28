@@ -1,3 +1,4 @@
+import gc
 import os
 import csv
 import time
@@ -102,6 +103,7 @@ class Simulation:
             predictions, indices = self.ffcae.encoder_prediction(start_window=current_interval,
                                                                  end_window=current_interval+1)
             clusters, labels = self.gmm.best_communities(predictions)
+            gc.collect()
 
 
 def arguments():

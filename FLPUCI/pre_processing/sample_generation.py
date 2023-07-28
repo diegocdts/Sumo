@@ -159,6 +159,7 @@ class SampleHandler:
             if len(user_samples) > 0:
                 indices.append(index)
                 datasets.append(user_samples)
+            del user_samples
         return np.array(datasets), np.array(indices)
 
     def get_samples(self, file_path: str, start_window: int, end_window: int):
@@ -178,6 +179,7 @@ class SampleHandler:
                 sample = sample.reshape(self.settings.width, self.settings.height)
                 if sample.max() > sample.min():
                     samples.append(sample)
+                del sample
         samples = np.array(samples)
         return reshape(samples)
 
@@ -207,4 +209,7 @@ class SampleHandler:
         for dataset in datasets:
             for sample in dataset:
                 samples.append(sample)
+                del sample
+            del dataset
+        del datasets
         return np.array(samples), indices

@@ -63,6 +63,7 @@ class FederatedSampleHandler:
                 federated_dataset = data.Dataset.from_tensor_slices(dataset)
                 preprocessed = self.preprocess(federated_dataset)
                 federated_dataset_samples.append(preprocessed)
+            del dataset, federated_dataset, preprocessed
         del users_dataset_samples
         return federated_dataset_samples
 
@@ -141,6 +142,7 @@ class FederatedFullConvolutionalAutoEncoder:
             if len(training_data) > 0:
                 round_iteration = self.iterative_process.next(self.state, training_data)
                 self.state = round_iteration[0]
+        del training_data
 
     def encoder_prediction(self, start_window: int, end_window: int):
         """
