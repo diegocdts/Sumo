@@ -150,9 +150,12 @@ class FederatedFullConvolutionalAutoEncoder:
         :return: the encoded samples and the list of indices of users who have not empty datasets
         """
         samples, indices = self.federated_sample_handler.sample_handler.samples_as_list(start_window, end_window)
+        print('clients to group at interval {}: {}'.format(start_window, len(samples)))
+
         keras_model = model_build(self.properties)
         self.state.model.assign_weights_to(keras_model)
         encoder = get_trained_encoder(keras_model)
+
         if len(samples) > 0:
             predictions = encoder.predict(samples)
         else:
