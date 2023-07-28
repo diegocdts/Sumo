@@ -110,7 +110,7 @@ def arguments():
     :return: the parsed arguments
     """
     parser = argparse.ArgumentParser(description='Required arguments to run SUMO simulations')
-    parser.add_argument('--scenario_path', type=str, default='2023-07-26-15-30-18', help='The relative path of the '
+    parser.add_argument('--scenario_path', type=str, default='2023-07-27-16-02-11', help='The relative path of the '
                                                                                          'scenario')
     parser.add_argument('--simulation_time', type=int, default=7200, help='The simulation time duration')
     parser.add_argument('--temporal_resolution', type=int, default=360, help='The interval to generate mobility '
