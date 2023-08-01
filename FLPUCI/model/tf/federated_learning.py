@@ -137,7 +137,7 @@ class FederatedFullConvolutionalAutoEncoder:
         training_data = self.federated_sample_handler.users_data(start_window, end_window)
 
         for round_num in range(rounds):
-            print('start: {} | end: {} | round: {} | training samples clients {}'
+            print('start: {} | end: {} | round: {} | training clients: {}'
                   .format(start_window, end_window, round_num, len(training_data)))
             if len(training_data) > 0:
                 round_iteration = self.iterative_process.next(self.state, training_data)
