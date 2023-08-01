@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2023-08-01 14:06:46.623987 by osmWebWizard.py UNKNOWN
+<configuration>
+    <net-file value="/home/diegocdts/Sumo/2023-08-01-14-06-40/osm.net.xml.gz"/>
+    <output-trip-file value="/home/diegocdts/Sumo/2023-08-01-14-06-40/osm.pedestrian.trips.xml"/>
+    <route-file value="/home/diegocdts/Sumo/2023-08-01-14-06-40/osm.pedestrian.rou.xml"/>
+    <pedestrians value="True"/>
+    <prefix value="ped"/>
+    <vehicle-class value="pedestrian"/>
+    <fringe-factor value="10"/>
+    <max-distance value="2000.0"/>
+    <end value="1200.0"/>
+    <insertion-density value="10.0"/>
+</configuration>
+-->
+
+<!-- generated on 2023-08-01 14:06:46 by Eclipse SUMO duarouter Version 1.18.0
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/duarouterConfiguration.xsd">
+
+    <input>
+        <net-file value="/home/diegocdts/Sumo/2023-08-01-14-06-40/osm.net.xml.gz"/>
+        <route-files value="/home/diegocdts/Sumo/2023-08-01-14-06-40/osm.pedestrian.trips.xml"/>
+    </input>
+
+    <output>
+        <output-file value="/home/diegocdts/Sumo/2023-08-01-14-06-40/osm.pedestrian.rou.xml"/>
+        <alternatives-output value="NUL"/>
+    </output>
+
+    <time>
+        <begin value="0.0"/>
+        <end value="1200.0"/>
+    </time>
+
+    <report>
+        <no-warnings value="true"/>
+        <ignore-errors value="true"/>
+        <no-step-log value="true"/>
+    </report>
+
+</configuration>
+-->
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+    <vType id="ped_pedestrian" vClass="pedestrian"/>
+    <person id="ped1" type="ped_pedestrian" depart="36.07">
+        <walk edges="168651024#1 168651024#0 168651024#5 168651024#4"/>
+    </person>
+    <person id="ped3" type="ped_pedestrian" depart="108.20">
+        <walk edges="887038464#3 -823646141#1 -823646141#0 -887038472#0"/>
+    </person>
+    <person id="ped7" type="ped_pedestrian" depart="252.46">
+        <walk edges="181935425#2 181935425#1 181935425#0"/>
+    </person>
+    <person id="ped14" type="ped_pedestrian" depart="504.92">
+        <walk edges="823589202#0"/>
+    </person>
+    <person id="ped26" type="ped_pedestrian" depart="937.72">
+        <walk edges="181935425#1 181935424#1 181935422 181935426#2"/>
+    </person>
+</routes>
