@@ -99,10 +99,10 @@ class Simulation:
             if not self.ffcae:
                 self.ffcae = ffcae(self.settings, self.parameters, self.properties)
 
-            self.ffcae.training(start_window=current_interval - self.settings.window_size, end_window=current_interval)
             predictions, indices = self.ffcae.encoder_prediction(start_window=current_interval,
-                                                                 end_window=current_interval+1)
+                                                                 end_window=current_interval + 1)
             clusters, labels = self.gmm.best_communities(predictions)
+            self.ffcae.training(start_window=current_interval - self.settings.window_size, end_window=current_interval)
             gc.collect()
 
 
