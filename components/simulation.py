@@ -3,7 +3,7 @@ import csv
 import time
 import traci
 
-#from FLPUCI.model.learning import Server
+from FLPUCI.model.learning import Server
 from FLPUCI.pre_processing.sample_generation import DisplacementMatrix
 from FLPUCI.utils.props import FCAEProperties, TrainingParameters
 from components.settings import SimulationSettings
@@ -21,7 +21,7 @@ class Simulation:
         self.settings = settings
 
         self.dm = DisplacementMatrix(settings)
-        #self.server = Server(settings, parameters, properties)
+        self.server = Server(settings, parameters, properties)
 
         self.current_interval = 0  # initiates the interval controller
 
@@ -39,7 +39,7 @@ class Simulation:
             if self.interval_changed():   # performs the computation when the interval changes
 
                 self.dm.new_record(self.current_interval)
-                #self.server.autoencoder_training(self.current_interval)
+                self.server.autoencoder_training(self.current_interval)
                 self.current_interval += 1
 
             self.write_trace(vehicles, self.current_interval)
@@ -75,7 +75,7 @@ class Simulation:
             vehid = vehicles[i]
             x, y = traci.vehicle.getPosition(vehicles[i])
 
-            record = [current_interval, x, y, traci.simulation.getTime()]
+            record = [current_interval, round(x, 2), round(y, 2), int(traci.simulation.getTime())]
 
             vehicle_csv_file = os.path.join(self.settings.trace_path, f'{vehid}.csv')
 
