@@ -19,9 +19,11 @@ class Simulation:
         :param properties a FCAEProperties object
         """
         self.settings = settings
+        self.parameters = parameters
+        self.properties = properties
 
         self.dm = DisplacementMatrix(settings)
-        self.server = Server(settings, parameters, properties)
+        self.server = None
 
         self.current_interval = 0  # initiates the interval controller
 
@@ -36,11 +38,7 @@ class Simulation:
 
             vehicles = traci.vehicle.getIDList()
 
-            if self.interval_changed():   # performs the computation when the interval changes
-
-                self.dm.new_record(self.current_interval)
-                self.server.autoencoder_training(self.current_interval)
-                self.current_interval += 1
+            self.interval_change()
 
             self.write_trace(vehicles, self.current_interval)
 
@@ -56,14 +54,18 @@ class Simulation:
         return traci.simulation.getMinExpectedNumber() > 0 \
             and traci.simulation.getTime() < self.settings.simulation_time
 
-    def interval_changed(self):
+    def interval_change(self):
         """
-        specifies the interval changing condition
-        :return: True if traci.simulation.getTime() module self.settings.temporal_resolution equals zero.
-        False otherwise
+        performs specific computations when the interval changes
         """
         print(traci.simulation.getTime())
-        return traci.simulation.getTime() % self.settings.temporal_resolution == 0
+        if traci.simulation.getTime() % self.settings.temporal_resolution == 0:
+            self.dm.new_record(self.current_interval)
+
+            if not self.server:
+                self.server = Server(self.settings, self.parameters, self.properties)
+            self.server.autoencoder_training(self.current_interval)
+            self.current_interval += 1
 
     def write_trace(self, vehicles, current_interval):
         """
