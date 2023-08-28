@@ -1,7 +1,7 @@
 import warnings
 
-from components.settings import SimulationSettings
-from components.simulation import Simulation, arguments
+from components.settings import SimulationSettings, arguments
+from components.simulation import Simulation
 from components.instances import parameters, properties
 
 warnings.filterwarnings("ignore")

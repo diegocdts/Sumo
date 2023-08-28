@@ -2,12 +2,11 @@ import gc
 import os
 import csv
 import time
-import argparse
 import traci
 
 from FLPUCI.model.clustering import GaussianMixtureModel
 from FLPUCI.pre_processing.sample_generation import DisplacementMatrix
-from FLPUCI.model.tf.federated_learning import FederatedFullConvolutionalAutoEncoder as ffcae
+from FLPUCI.model.tf.federated_learning import FederatedFullConvolutionalAutoEncoder as FederatedModel
 from FLPUCI.utils.props import FCAEProperties, TrainingParameters
 from components.settings import SimulationSettings
 
@@ -26,7 +25,7 @@ class Simulation:
         self.properties = properties
 
         self.dm = DisplacementMatrix(settings)
-        self.ffcae = None
+        self.federated_model = None
         self.gmm = GaussianMixtureModel(settings.max_communities)
 
         self.current_interval = 0  # initiates the interval controller
@@ -94,28 +93,13 @@ class Simulation:
         :param current_interval: the current interval
         """
         if current_interval >= self.settings.window_size:
-            if not self.ffcae:
-                self.ffcae = ffcae(self.settings, self.parameters, self.properties)
+            if not self.federated_model:
+                self.federated_model = FederatedModel(self.settings, self.parameters, self.properties)
 
-            predictions, indices = self.ffcae.encoder_prediction(start_window=current_interval,
-                                                                 end_window=current_interval + 1)
+            predictions, indices = self.federated_model.encoder_prediction(start_window=current_interval,
+                                                                           end_window=current_interval + 1)
             clusters, labels = self.gmm.best_communities(predictions)
-            self.ffcae.training(start_window=current_interval - self.settings.window_size, end_window=current_interval)
+            self.federated_model.training(
+                start_window=current_interval - self.settings.window_size,
+                end_window=current_interval)
             gc.collect()
-
-
-def arguments():
-    """
-    sets the required arguments to run SUMO simulations
-    :return: the parsed arguments
-    """
-    parser = argparse.ArgumentParser(description='Required arguments to run SUMO simulations')
-    parser.add_argument('--scenario_path', type=str, default='None', help='The relative path of the scenario')
-    parser.add_argument('--simulation_time', type=int, default=7200, help='The simulation time duration')
-    parser.add_argument('--temporal_resolution', type=int, default=120, help='The interval to generate mobility '
-                                                                             'samples')
-    parser.add_argument('--spatial_resolution', type=int, default=150, help='The cell resolution')
-    parser.add_argument('--window_size', type=int, default=4, help='The number of intervals inside a window')
-    parser.add_argument('--max_communities', type=int, default=10, help='The total number of communities to be tested '
-                                                                        'by the GaussianMixtureModel')
-    return parser.parse_args()
