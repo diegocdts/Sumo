@@ -1,12 +1,10 @@
-import gc
 import os
 import csv
 import time
 import traci
 
-from FLPUCI.model.clustering import GaussianMixtureModel
+#from FLPUCI.model.learning import Server
 from FLPUCI.pre_processing.sample_generation import DisplacementMatrix
-from FLPUCI.model.tf.architecture import FederatedArchitecture as FederatedModel
 from FLPUCI.utils.props import FCAEProperties, TrainingParameters
 from components.settings import SimulationSettings
 
@@ -21,12 +19,9 @@ class Simulation:
         :param properties a FCAEProperties object
         """
         self.settings = settings
-        self.parameters = parameters
-        self.properties = properties
 
         self.dm = DisplacementMatrix(settings)
-        self.federated_model = None
-        self.gmm = GaussianMixtureModel(settings.max_communities)
+        #self.server = Server(settings, parameters, properties)
 
         self.current_interval = 0  # initiates the interval controller
 
@@ -44,7 +39,7 @@ class Simulation:
             if self.interval_changed():   # performs the computation when the interval changes
 
                 self.dm.new_record(self.current_interval)
-                self.federated_learning(self.current_interval)
+                #self.server.autoencoder_training(self.current_interval)
                 self.current_interval += 1
 
             self.write_trace(vehicles, self.current_interval)
@@ -67,6 +62,7 @@ class Simulation:
         :return: True if traci.simulation.getTime() module self.settings.temporal_resolution equals zero.
         False otherwise
         """
+        print(traci.simulation.getTime())
         return traci.simulation.getTime() % self.settings.temporal_resolution == 0
 
     def write_trace(self, vehicles, current_interval):
@@ -86,20 +82,3 @@ class Simulation:
             with open(vehicle_csv_file, 'a', newline='') as file_csv:
                 writer = csv.writer(file_csv)
                 writer.writerow(record)
-
-    def federated_learning(self, current_interval: int):
-        """
-        performs federated model training and clusters the users of the current interval
-        :param current_interval: the current interval
-        """
-        if current_interval >= self.settings.window_size:
-            if not self.federated_model:
-                self.federated_model = FederatedModel(self.settings, self.parameters, self.properties)
-
-            predictions, indices = self.federated_model.encoder_prediction(start_window=current_interval,
-                                                                           end_window=current_interval + 1)
-            clusters, labels = self.gmm.best_communities(predictions)
-            self.federated_model.training(
-                start_window=current_interval - self.settings.window_size,
-                end_window=current_interval)
-            gc.collect()
