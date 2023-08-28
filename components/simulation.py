@@ -56,7 +56,8 @@ class Simulation:
     def condition_to_run(self):
         """
         specifies the condition to run a mobility simulation
-        :return: True if the traci.simulation.getTime() achieved the self.settings.simulation_time. False otherwise
+        :return: True if the number of all active vehicles and persons in the net plus the ones waiting to start is
+        bigger than zero and traci.simulation.getTime() is small than self.settings.simulation_time. False otherwise
         """
         return traci.simulation.getMinExpectedNumber() > 0 \
             and traci.simulation.getTime() < self.settings.simulation_time
