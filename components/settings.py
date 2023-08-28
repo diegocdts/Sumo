@@ -74,6 +74,7 @@ class SimulationSettings:
 
         - max_communities: total number of communities to be tested by the GaussianMixtureModel
         :param args: parsed arguments
+        :param properties: FCAEProperties object
         """
         self.scenario_path = args.scenario_path
         self.trace_path = dir_exists_create(f'{self.scenario_path}/{run_id()}')
