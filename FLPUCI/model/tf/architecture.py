@@ -68,11 +68,11 @@ class FederatedSampleHandler:
         return federated_dataset_samples
 
 
-class FederatedFullConvolutionalAutoEncoder:
+class FederatedArchitecture:
 
     def __init__(self, settings: SimulationSettings, parameters: TrainingParameters, properties: FCAEProperties):
         """
-        Instantiates a FederatedFullConvolutionalAutoEncoder to perform federated training and prediction over mobility
+        Instantiates a FederatedArchitecture to perform federated training and prediction over mobility
         trace data
         :param settings: a SimulationSettings object
         :param parameters: a TrainingParameters object

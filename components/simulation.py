@@ -6,7 +6,7 @@ import traci
 
 from FLPUCI.model.clustering import GaussianMixtureModel
 from FLPUCI.pre_processing.sample_generation import DisplacementMatrix
-from FLPUCI.model.tf.federated_learning import FederatedFullConvolutionalAutoEncoder as FederatedModel
+from FLPUCI.model.tf.architecture import FederatedArchitecture as FederatedModel
 from FLPUCI.utils.props import FCAEProperties, TrainingParameters
 from components.settings import SimulationSettings
 
