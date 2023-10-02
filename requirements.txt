@@ -1,4 +1,4 @@
-tensorflow-federated==0.19.0
+tensorflow-federated
 traci
 sumolib
 nest_asyncio

@@ -160,7 +160,7 @@ class SampleHandler:
                 indices.append(index)
                 datasets.append(user_samples)
             del user_samples
-        return np.array(datasets), np.array(indices)
+        return datasets, indices
 
     def get_samples(self, file_path: str, start_window: int, end_window: int):
         """

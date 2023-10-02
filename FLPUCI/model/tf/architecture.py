@@ -84,14 +84,13 @@ class FederatedArchitecture:
 
         self.iterative_process, self.state = self.global_model_start()
         self.evaluator = self.build_evaluator()
-        tff.backends.native.set_local_execution_context(clients_per_thread=100)
 
     def global_model_start(self):
         """
         initiates a global model
         :return: the iterative training process and the initial model state
         """
-        iterative_process = tff.learning.build_federated_averaging_process(
+        iterative_process = tff.learning.algorithms.build_weighted_fed_avg(
             model_fn=self.model_fn,
             client_optimizer_fn=lambda: keras.optimizers.Adam(learning_rate=self.properties.learning_rate),
             server_optimizer_fn=lambda: keras.optimizers.Adam(learning_rate=self.properties.learning_rate)
@@ -112,7 +111,7 @@ class FederatedArchitecture:
         """
         keras_model = model_build(self.properties)
         #  print(keras_model.summary())
-        return tff.learning.from_keras_model(
+        return tff.learning.models.from_keras_model(
             keras_model=keras_model,
             input_spec=self.federated_sample_handler.element_spec,
             loss=keras.losses.MeanSquaredError()
