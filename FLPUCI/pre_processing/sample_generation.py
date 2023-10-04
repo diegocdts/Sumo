@@ -34,6 +34,7 @@ class DisplacementMatrix:
         """
         self.settings = settings
         self.header = ['interval', 'x', 'y', 'time']
+        self.columns = np.arange(0, self.settings.width * self.settings.height, 1)
 
     def new_record(self, interval: int):
         """
@@ -45,35 +46,30 @@ class DisplacementMatrix:
             trace_df = pd.read_csv(file_path, names=self.header)
 
             dm_file_path = get_file_path(self.settings.dm_path, file_name)
-            dm_df = self.get_matrix(dm_file_path)
+            self.displacement_matrix(dm_file_path)
 
             this_interval_records = trace_df[trace_df.interval == interval]
             copy = this_interval_records.copy().reset_index()
 
-            self.fill_record(copy, dm_df, dm_file_path)
+            self.fill_record(copy, dm_file_path)
 
-    def get_matrix(self, file_path: str):
+    def displacement_matrix(self, file_path: str):
         """
-        accesses the displacement matrix
+        creates the displacement matrix
         :param file_path: path to the displacement matrix to be created or accessed
         :return: the displacement matrix
         """
         if not os.path.exists(file_path):
-            columns = np.arange(0, self.settings.width * self.settings.height, 1)
-            matrix = pd.DataFrame(columns=columns)
+            matrix = pd.DataFrame(columns=self.columns)
             matrix.to_csv(file_path, index=False)
-        else:
-            matrix = pd.read_csv(file_path)
-        return matrix
 
-    def fill_record(self, this_interval_records: pd.DataFrame, dm_df: pd.DataFrame, file_path: str):
+    def fill_record(self, this_interval_records: pd.DataFrame, file_path: str):
         """
         fills a new displacement matrix record 
         :param this_interval_records: the trace data regarding the considered interval
-        :param dm_df: the displacement matrix as a DataFrame
         :param file_path: the displacement matrix path
         """
-        cell_stay_time = np.zeros(len(dm_df.columns))
+        cell_stay_time = np.zeros(len(self.columns))
 
         if len(this_interval_records) > 0:
             previous_time = this_interval_records.time[0] - 1
