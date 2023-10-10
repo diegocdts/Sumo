@@ -10,6 +10,8 @@ class Server:
         self.autoencoder_model = FederatedArchitecture(settings, parameters, properties)
         self.clustering_model = GaussianMixtureModel(settings.max_communities)
         self.window_size = settings.window_size
+        self.clusters = []
+        self.labels = []
 
     def autoencoder_training(self, current_interval: int):
         """
@@ -30,4 +32,4 @@ class Server:
         if current_interval >= self.window_size:
             predictions, indices = self.autoencoder_model.encoder_prediction(start_window=current_interval,
                                                                              end_window=current_interval + 1)
-            return self.clustering_model.best_communities(predictions)
+            self.clusters, self.labels = self.clustering_model.best_communities(predictions)
