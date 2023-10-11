@@ -62,7 +62,7 @@ class DisplacementMatrix:
         """
         if not os.path.exists(file_path):
             matrix = pd.DataFrame(columns=self.columns)
-            matrix.to_csv(file_path, index=False)
+            matrix.to_csv(file_path, index=False, header=False)
 
     def fill_record(self, this_interval_records: pd.DataFrame, file_path: str):
         """
