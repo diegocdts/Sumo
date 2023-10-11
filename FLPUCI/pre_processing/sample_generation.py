@@ -4,6 +4,7 @@ import random
 
 import numpy as np
 import pandas as pd
+from matplotlib import pyplot as plt
 
 from FLPUCI.utils.helpers import sorted_files, get_file_path
 from components.settings import SimulationSettings
@@ -129,6 +130,21 @@ def reshape(samples: np.array):
     elif len(samples.shape) == 3:
         samples = np.reshape(samples, (samples.shape[0], samples.shape[1], samples.shape[2], 1))
     return samples
+
+
+def heatmaps_view(dataset):
+    if len(dataset) > 2:
+        dataset = dataset[1:3]
+        plt.figure(figsize=(20, 10))
+        for i in range(2):
+            i = int(i)
+            plt.subplot(1, 2, i + 1)
+            plt.subplots_adjust(top=1, bottom=0, right=1, left=0, hspace=0, wspace=0)
+            plt.xticks([])
+            plt.yticks([])
+            plt.grid(False)
+            plt.imshow(dataset[i])
+        plt.show()
 
 
 class SampleHandler:
