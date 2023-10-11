@@ -154,7 +154,7 @@ class FederatedArchitecture:
         print('clients to group at interval {}: {}'.format(start_window, len(samples)))
 
         keras_model = model_build(self.properties)
-        self.state.model.assign_weights_to(keras_model)
+        self.state.global_model_weights.assign_weights_to(keras_model)
         encoder = get_trained_encoder(keras_model)
 
         if len(samples) > 0:
