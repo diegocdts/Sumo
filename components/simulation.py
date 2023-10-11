@@ -64,7 +64,7 @@ class Simulation:
 
             if not self.server:
                 self.server = Server(self.settings, self.parameters, self.properties)
-            self.server.autoencoder_training(self.current_interval)
+            self.server.autoencoder_training(self.current_interval + 1)
             self.server.clustering(self.current_interval)
             self.current_interval += 1
 
