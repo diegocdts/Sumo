@@ -133,12 +133,11 @@ def reshape(samples: np.array):
 
 
 def heatmaps_view(dataset):
-    if len(dataset) > 2:
-        dataset = dataset[1:3]
+    if len(dataset) > 0:
         plt.figure(figsize=(20, 10))
-        for i in range(2):
+        for i in range(len(dataset)):
             i = int(i)
-            plt.subplot(1, 2, i + 1)
+            plt.subplot(1, len(dataset), i + 1)
             plt.subplots_adjust(top=1, bottom=0, right=1, left=0, hspace=0, wspace=0)
             plt.xticks([])
             plt.yticks([])
