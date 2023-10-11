@@ -169,7 +169,8 @@ class SampleHandler:
             file_path = get_file_path(self.settings.dm_path, file_name)
             user_samples = self.get_samples(file_path, start_window, end_window)
             if len(user_samples) > 0:
-                indices.append(index)
+                dataset_id = file_name.replace('.csv', '')
+                indices.append(dataset_id) #TODO: usar o file_name na lista de indices
                 datasets.append(user_samples)
             del user_samples
         return datasets, indices
