@@ -14,3 +14,5 @@ FLPUCI/model/__pycache__/
 2023*/
 
 FLPUCI/model/tf/__pycache__/
+
+_manhattan/sim_*
