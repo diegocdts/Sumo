@@ -17,8 +17,8 @@ class GaussianMixtureModel:
 
     def best_communities(self, input_data: np.array):
         best_aic_score = None
-        best_clusters = None
-        best_labels = None
+        best_clusters = []
+        best_labels = []
         if input_data is not None:
             for k in self.max_communities:
                 if 1 < len(input_data) >= k:
