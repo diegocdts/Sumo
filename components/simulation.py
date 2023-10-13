@@ -67,6 +67,7 @@ class Simulation:
             self.server.autoencoder_training(self.current_interval + 1)
             self.server.clustering(self.current_interval)
             self.current_interval += 1
+            self.cluster_travel_analysis()
 
     def write_trace(self, vehicles, current_interval):
         """
@@ -85,3 +86,14 @@ class Simulation:
             with open(vehicle_csv_file, 'a', newline='') as file_csv:
                 writer = csv.writer(file_csv)
                 writer.writerow(record)
+
+    def cluster_travel_analysis(self):
+        vehicles = traci.vehicle.getIDList()
+        if len(self.server.clusters) > 0:
+            for cluster in self.server.clusters:
+                index_list = [index for index, label in enumerate(self.server.labels) if label == cluster]
+                for index in index_list:
+                    user = self.server.users[index]
+                    if user in traci.vehicle.getIDList():
+                        route = traci.vehicle.getRoute(user)
+                        print(route)
