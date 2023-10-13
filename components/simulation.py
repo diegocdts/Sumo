@@ -94,6 +94,6 @@ class Simulation:
                 index_list = [index for index, label in enumerate(self.server.labels) if label == cluster]
                 for index in index_list:
                     user = self.server.users[index]
-                    if user in traci.vehicle.getIDList():
+                    if user in vehicles:
                         route = traci.vehicle.getRoute(user)
                         print(route)
