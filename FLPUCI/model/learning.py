@@ -12,7 +12,7 @@ class Server:
         self.window_size = settings.window_size
         self.clusters = []
         self.labels = []
-        self.indices = []
+        self.users = []
 
     def autoencoder_training(self, current_interval: int):
         """
@@ -34,4 +34,4 @@ class Server:
             predictions, indices = self.autoencoder_model.encoder_prediction(start_window=current_interval,
                                                                              end_window=current_interval + 1)
             self.clusters, self.labels = self.clustering_model.best_communities(predictions)
-            self.indices = indices
+            self.users = indices
