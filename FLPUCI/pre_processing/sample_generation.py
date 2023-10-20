@@ -146,6 +146,21 @@ def heatmaps_view(dataset):
         plt.show()
 
 
+def compare_samples_reconstructions(samples, reconstructions):
+    if len(samples) > 0 and len(reconstructions) > 0:
+        plt.figure(figsize=(20, 10))
+        for sample, reconstruction in zip(samples, reconstructions):
+            plt.subplots_adjust(top=1, bottom=0, right=1, left=0, hspace=0, wspace=0)
+            plt.xticks([])
+            plt.yticks([])
+            plt.grid(False)
+            plt.subplot(1, 2, 1)
+            plt.imshow(sample)
+            plt.subplot(1, 2, 2)
+            plt.imshow(reconstruction)
+        plt.show()
+
+
 class SampleHandler:
 
     def __init__(self, settings: SimulationSettings):

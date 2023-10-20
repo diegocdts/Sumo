@@ -4,7 +4,7 @@ import collections
 from tensorflow import data, constant, keras
 
 from FLPUCI.model.tf.autoencoder import model_build, get_trained_encoder
-from FLPUCI.pre_processing.sample_generation import SampleHandler
+from FLPUCI.pre_processing.sample_generation import SampleHandler, compare_samples_reconstructions
 from FLPUCI.utils.props import TrainingParameters, FCAEProperties
 from components.settings import SimulationSettings
 
@@ -158,6 +158,12 @@ class FederatedArchitecture:
         encoder = get_trained_encoder(keras_model)
 
         if len(samples) > 0:
+
+            keras_model.compile(optimizer=keras.optimizers.Adam(learning_rate=self.properties.learning_rate),
+                                loss=keras.losses.MeanSquaredError(), run_eagerly=True)
+            reconstructions = keras_model.predict(samples)
+            compare_samples_reconstructions(samples, reconstructions)
+
             predictions = encoder.predict(samples)
         else:
             predictions = None
