@@ -79,7 +79,7 @@ class DisplacementMatrix:
                 # cell position calculation
                 x_index = int(row.x / self.settings.spatial_resolution)
                 y_index = int(row.y / self.settings.spatial_resolution)
-                cell = (y_index * self.settings.height) + x_index
+                cell = (x_index * self.settings.height) + y_index
 
                 # time a node spends in a cell
                 delta_time = row.time - previous_time
