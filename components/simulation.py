@@ -25,7 +25,7 @@ class Simulation:
         self.dm = DisplacementMatrix(settings)
         self.server = None
 
-        self.current_interval = 0  # initiates the interval controller
+        self.current_interval = 1  # initiates the interval controller
 
         self.run()
 
@@ -64,7 +64,7 @@ class Simulation:
 
             if not self.server:
                 self.server = Server(self.settings, self.parameters, self.properties)
-            self.server.autoencoder_training(self.current_interval + 1)
+            self.server.autoencoder_training(self.current_interval)
             self.server.clustering(self.current_interval)
             self.current_interval += 1
             self.cluster_travel_analysis()
