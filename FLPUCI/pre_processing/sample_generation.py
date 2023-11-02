@@ -166,7 +166,10 @@ def compare_samples_reconstructions(samples, reconstructions):
             plt.imshow(reconstructions[i])
             plt.title("Reconstruction")
 
-            plt.show()
+            path = 'comparisons'
+            if not os.path.exists(path):
+                os.mkdir(path)
+            plt.savefig(f'{path}/{i}.png')
 
 
 class SampleHandler:
