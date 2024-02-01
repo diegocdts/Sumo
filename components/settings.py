@@ -112,7 +112,7 @@ def arguments():
     parser.add_argument('--scenario_path', type=str, default='None', help='The relative path of the scenario')
     parser.add_argument('--simulation_time', type=int, default=7200, help='The simulation time duration')
     parser.add_argument('--temporal_resolution', type=int, default=60, help='The interval to generate mobility '
-                                                                             'samples')
+                                                                            'samples')
     parser.add_argument('--spatial_resolution', type=int, default=20, help='The cell resolution')
     parser.add_argument('--window_size', type=int, default=3, help='The number of intervals inside a window')
     parser.add_argument('--max_communities', type=int, default=10, help='The total number of communities to be tested '

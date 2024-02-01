@@ -103,22 +103,6 @@ class DisplacementMatrix:
         return cells_stay_time_str
 
 
-def handle_pixels(sample_pixels: np.array):
-    """
-    handles the pixels of a sample
-    :param sample_pixels: the sample pixels
-    :return: the sample pixels treated
-    """
-    if sample_pixels.max() != sample_pixels.min():
-        delta = sample_pixels.max() - sample_pixels.min()
-        pixels = np.absolute(sample_pixels.astype("float64")) / delta
-        pixels = 1 - pixels
-        pixels = pixels + np.absolute(pixels.min())
-    else:
-        pixels = np.absolute(sample_pixels) * 0
-    return pixels
-
-
 def reshape(samples: np.array):
     """
     reshapes the array of samples by adding the gray scale axis
@@ -172,6 +156,10 @@ def compare_samples_reconstructions(samples, reconstructions):
             plt.savefig(f'{path}/{i}.png')
 
 
+def min_max_scaling(pixels: np.array):
+    return (pixels - pixels.min()) / (pixels.max() - pixels.min())
+
+
 class SampleHandler:
 
     def __init__(self, settings: SimulationSettings):
@@ -213,9 +201,9 @@ class SampleHandler:
             intervals = file.readlines()[start_window:end_window]
             for interval in intervals:
                 sample = np.array(interval.split(','), dtype="float64")
-                sample = handle_pixels(sample)
-                sample = sample.reshape(self.settings.width, self.settings.height)
                 if sample.max() > sample.min():
+                    sample = min_max_scaling(sample)
+                    sample = sample.reshape(self.settings.width, self.settings.height)
                     samples.append(sample)
                 del sample
         samples = np.array(samples)
