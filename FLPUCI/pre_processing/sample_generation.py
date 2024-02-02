@@ -1,4 +1,3 @@
-import math
 import os.path
 import random
 
@@ -10,20 +9,16 @@ from FLPUCI.utils.helpers import sorted_files, get_file_path
 from components.settings import SimulationSettings
 
 
-def logit(cells_list: list):
+def logit(normalized_cell_stay_time: list):
     """
     performs logit transformation over the displacement matrix
-    :param cells_list: the displacement matrix cells as a list
+    :param normalized_cell_stay_time: the displacement matrix cells as a list
     :return: the displacement matrix cells transformed
     """
-    for j in range(len(cells_list)):
-        p = float(cells_list[j])
-        e = float(0)
-        if p == float(0) or p == float(1):
-            e += 0.000001
-        new_p = math.log((p + e) / ((1 - p) + e))
-        cells_list[j] = new_p
-    return cells_list
+    epsilon = 1e-15
+    arr_clipped = np.clip(normalized_cell_stay_time, epsilon, 1 - epsilon)
+    arr_logit = np.log(arr_clipped / (1 - arr_clipped))
+    return arr_logit
 
 
 class DisplacementMatrix:
