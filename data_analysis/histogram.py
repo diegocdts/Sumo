@@ -18,6 +18,7 @@ for file in dms:
 
     x = []
     y = []
+    stay_times = []
 
     for heatmap in dm:
         for cell_index, stay_time in enumerate(heatmap):
@@ -26,6 +27,7 @@ for file in dms:
                 y_index = int(cell_index / 128)
                 x.append(x_index)
                 y.append(y_index)
+                stay_times.append(stay_time)
     x = np.array(x)
     y = np.array(y)
 
@@ -46,5 +48,15 @@ for file in dms:
 
     ax.bar3d(xpos, ypos, zpos, dx, dy, dz, zsort='average')
     fig.suptitle(file.replace('.csv', ''))
+    plt.xlabel('Visited cells')
+    plt.ylabel('Visited cells')
+    ax.set_zlabel('Frequency')
+
+    plt.show()
+
+    plt.hist(stay_times, bins=10, weights=np.ones(len(stay_times)) / len(stay_times) * 100)
+    plt.suptitle(file.replace('.csv', ''))
+    plt.xlabel('Normalized stay time in cells')
+    plt.ylabel('Frequency')
 
     plt.show()
