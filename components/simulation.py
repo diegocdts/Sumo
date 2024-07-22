@@ -3,97 +3,62 @@ import csv
 import time
 import traci
 
-from FLPUCI.model.learning import Server
-from FLPUCI.pre_processing.sample_generation import DisplacementMatrix
-from FLPUCI.utils.props import FCAEProperties, TrainingParameters
 from components.settings import SimulationSettings
 
 
 class Simulation:
-    def __init__(self, settings: SimulationSettings, parameters: TrainingParameters, properties: FCAEProperties):
+    def __init__(self, settings: SimulationSettings):
         """
         Instantiates and starts a simulation, exporting raw mobility data of each moving object to its respective file.
         It creates one directory for each simulation round, identified by yyyy-mm-dd-H-M-S
         :param settings a SimulationSettings object that contains all relevant information for the mobility simulation
-        :param parameters a TrainingParameters object
-        :param properties a FCAEProperties object
         """
         self.settings = settings
-        self.parameters = parameters
-        self.properties = properties
-
-        self.dm = DisplacementMatrix(settings)
-        self.server = None
-
-        self.current_interval = 1  # initiates the interval controller
 
         self.run()
 
     def run(self):
         traci.start(self.settings.sumoCmd)
 
-        while self.condition_to_run():
+        while traci.simulation.getMinExpectedNumber() > 0:
 
             traci.simulationStep()
 
             vehicles = traci.vehicle.getIDList()
+            people = traci.person.getIDList()
 
-            self.interval_change()
-
-            self.write_trace(vehicles, self.current_interval)
+            self.write_trace(vehicles, people)
+            print(traci.simulation.getTime())
 
         traci.close()
         time.sleep(5)
 
-    def condition_to_run(self):
+    def write_trace(self, vehicles=None, people=None):
         """
-        specifies the condition to run a mobility simulation
-        :return: True if the number of all active vehicles and persons in the net plus the ones waiting to start is
-        bigger than zero and traci.simulation.getTime() is small than self.settings.simulation_time. False otherwise
-        """
-        return traci.simulation.getMinExpectedNumber() > 0 \
-            and traci.simulation.getTime() < self.settings.simulation_time
-
-    def interval_change(self):
-        """
-        performs specific computations when the interval changes
-        """
-        print(traci.simulation.getTime())
-        if traci.simulation.getTime() % self.settings.temporal_resolution == 0:
-            self.dm.new_record(self.current_interval)
-
-            if not self.server:
-                self.server = Server(self.settings, self.parameters, self.properties)
-            self.server.autoencoder_training(self.current_interval)
-            self.server.clustering(self.current_interval)
-            self.current_interval += 1
-            self.cluster_travel_analysis()
-
-    def write_trace(self, vehicles, current_interval):
-        """
-        writes the current position of a moving object in its respective simulation file
-        :param vehicles: the moving vehicles
-        :param current_interval: the current interval during simulation
+        writes the current position of each user in its respective simulation file
+        :param vehicles: list of vehicles
+        :param people: list of people
         """
         for i in range(0, len(vehicles)):
-            vehid = vehicles[i]
+            vehicle_id = vehicles[i]
             x, y = traci.vehicle.getPosition(vehicles[i])
 
-            record = [current_interval, round(x, 2), round(y, 2), int(traci.simulation.getTime())]
+            record = [round(x, 2), round(y, 2), int(traci.simulation.getTime())]
 
-            vehicle_csv_file = os.path.join(self.settings.trace_path, f'{vehid}.csv')
+            csv_file = os.path.join(self.settings.trace_path, f'{vehicle_id}.csv')
 
-            with open(vehicle_csv_file, 'a', newline='') as file_csv:
+            with open(csv_file, 'a', newline='') as file_csv:
                 writer = csv.writer(file_csv)
                 writer.writerow(record)
 
-    def cluster_travel_analysis(self):
-        vehicles = traci.vehicle.getIDList()
-        if len(self.server.clusters) > 0:
-            for cluster in self.server.clusters:
-                index_list = [index for index, label in enumerate(self.server.labels) if label == cluster]
-                for index in index_list:
-                    user = self.server.users[index]
-                    if user in vehicles:
-                        route = traci.vehicle.getRoute(user)
-                        print(route)
+        for i in range(0, len(people)):
+            person_id = people[i]
+            x, y = traci.person.getPosition(people[i])
+
+            record = [round(x, 2), round(y, 2), int(traci.simulation.getTime())]
+
+            csv_file = os.path.join(self.settings.trace_path, f'{person_id}.csv')
+
+            with open(csv_file, 'a', newline='') as file_csv:
+                writer = csv.writer(file_csv)
+                writer.writerow(record)
