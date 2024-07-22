@@ -1,9 +1,28 @@
 import os
-import csv
 import time
 import traci
+import re
 
 from components.settings import SimulationSettings
+
+
+def id_dict(key):
+    conditions = {
+        'bik': 1000,
+        'bus': 2000,
+        'mot': 3000,
+        'ped': 4000,
+        'tru': 5000,
+        'veh': 6000
+    }
+    return conditions.get(key[:3])
+
+
+def replace_id(id_key):
+    code_id = id_dict(id_key)  # get the code of a moving object
+    digit_index = re.search(r'\d', id_key).start()  # find the index position to cut the id
+    new_id = f'{code_id}{id_key[digit_index:]}'  # form the new id
+    return new_id
 
 
 class Simulation:
@@ -20,6 +39,8 @@ class Simulation:
     def run(self):
         traci.start(self.settings.sumoCmd)
 
+        ns_trace = os.path.join(self.settings.trace_path, 'ns_trace.txt')
+
         while traci.simulation.getMinExpectedNumber() > 0:
 
             traci.simulationStep()
@@ -27,38 +48,54 @@ class Simulation:
             vehicles = traci.vehicle.getIDList()
             people = traci.person.getIDList()
 
-            self.write_trace(vehicles, people)
+            self.write_trace(vehicles, people, ns_trace)
             print(traci.simulation.getTime())
 
         traci.close()
         time.sleep(5)
 
-    def write_trace(self, vehicles=None, people=None):
+    def write_trace(self, vehicles=None, people=None, ns_trace=''):
         """
         writes the current position of each user in its respective simulation file
         :param vehicles: list of vehicles
         :param people: list of people
+        :param ns_trace: path to the ns trace file
         """
+
+        timestamp = int(traci.simulation.getTime())
+
         for i in range(0, len(vehicles)):
             vehicle_id = vehicles[i]
-            x, y = traci.vehicle.getPosition(vehicles[i])
+            x, y = traci.vehicle.getPosition(vehicle_id)
 
-            record = [round(x, 2), round(y, 2), int(traci.simulation.getTime())]
+            x, y = round(x, 2), round(y, 2)
+            speed = round(traci.vehicle.getSpeed(vehicle_id), 2)
 
-            csv_file = os.path.join(self.settings.trace_path, f'{vehicle_id}.csv')
+            raw_record = f'{x}, {y}, {timestamp}\n'
+            ns_record = f'$ns_ at {timestamp} "$node_({replace_id(vehicle_id)}) setdest {x} {y} {speed}"\n'
 
-            with open(csv_file, 'a', newline='') as file_csv:
-                writer = csv.writer(file_csv)
-                writer.writerow(record)
+            raw_file = os.path.join(self.settings.trace_path, f'{vehicle_id}.csv')
+
+            with open(raw_file, 'a', newline='') as vehicle_file:
+                vehicle_file.write(raw_record)
+
+            with open(ns_trace, 'a', newline='') as ns_file:
+                ns_file.write(ns_record)
 
         for i in range(0, len(people)):
             person_id = people[i]
-            x, y = traci.person.getPosition(people[i])
+            x, y = traci.person.getPosition(person_id)
 
-            record = [round(x, 2), round(y, 2), int(traci.simulation.getTime())]
+            x, y = round(x, 2), round(y, 2)
+            speed = round(traci.person.getSpeed(person_id), 2)
 
-            csv_file = os.path.join(self.settings.trace_path, f'{person_id}.csv')
+            raw_record = f'{x}, {y}, {int(traci.simulation.getTime())}\n'
+            ns_record = f'$ns_ at {timestamp} "$node_({replace_id(person_id)}) setdest {x} {y} {speed}"\n'
 
-            with open(csv_file, 'a', newline='') as file_csv:
-                writer = csv.writer(file_csv)
-                writer.writerow(record)
+            raw_file = os.path.join(self.settings.trace_path, f'{person_id}.csv')
+
+            with open(raw_file, 'a', newline='') as person_file:
+                person_file.write(raw_record)
+
+            with open(ns_trace, 'a', newline='') as ns_file:
+                ns_file.write(ns_record)
