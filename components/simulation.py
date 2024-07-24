@@ -39,7 +39,7 @@ class Simulation:
     def run(self):
         traci.start(self.settings.sumoCmd)
 
-        ns_trace = os.path.join(self.settings.trace_path, 'ns_trace.txt')
+        one_trace = os.path.join(self.settings.trace_path, 'one_trace.txt')
 
         while traci.simulation.getMinExpectedNumber() > 0:
 
@@ -48,18 +48,18 @@ class Simulation:
             vehicles = traci.vehicle.getIDList()
             people = traci.person.getIDList()
 
-            self.write_trace(vehicles, people, ns_trace)
+            self.write_trace(vehicles, people, one_trace)
             print(traci.simulation.getTime())
 
         traci.close()
         time.sleep(5)
 
-    def write_trace(self, vehicles=None, people=None, ns_trace=''):
+    def write_trace(self, vehicles=None, people=None, one_trace=''):
         """
         writes the current position of each user in its respective simulation file
         :param vehicles: list of vehicles
         :param people: list of people
-        :param ns_trace: path to the ns trace file
+        :param one_trace: path to the ns trace file
         """
 
         timestamp = int(traci.simulation.getTime())
@@ -72,15 +72,15 @@ class Simulation:
             speed = round(traci.vehicle.getSpeed(vehicle_id), 2)
 
             raw_record = f'{x}, {y}, {timestamp}\n'
-            ns_record = f'$ns_ at {timestamp} "$node_({replace_id(vehicle_id)}) setdest {x} {y} {speed}"\n'
+            one_record = f'{timestamp} {replace_id(vehicle_id)} {x} {y}\n'
 
             raw_file = os.path.join(self.settings.trace_path, f'{vehicle_id}.csv')
 
             with open(raw_file, 'a', newline='') as vehicle_file:
                 vehicle_file.write(raw_record)
 
-            with open(ns_trace, 'a', newline='') as ns_file:
-                ns_file.write(ns_record)
+            with open(one_trace, 'a', newline='') as one_file:
+                one_file.write(one_record)
 
         for i in range(0, len(people)):
             person_id = people[i]
@@ -90,12 +90,12 @@ class Simulation:
             speed = round(traci.person.getSpeed(person_id), 2)
 
             raw_record = f'{x}, {y}, {int(traci.simulation.getTime())}\n'
-            ns_record = f'$ns_ at {timestamp} "$node_({replace_id(person_id)}) setdest {x} {y} {speed}"\n'
+            one_record = f'{timestamp} {replace_id(person_id)} {x} {y}\n'
 
             raw_file = os.path.join(self.settings.trace_path, f'{person_id}.csv')
 
             with open(raw_file, 'a', newline='') as person_file:
                 person_file.write(raw_record)
 
-            with open(ns_trace, 'a', newline='') as ns_file:
-                ns_file.write(ns_record)
+            with open(one_trace, 'a', newline='') as one_file:
+                one_file.write(one_record)
