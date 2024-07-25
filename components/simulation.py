@@ -1,28 +1,10 @@
 import os
+import sys
 import time
 import traci
 import re
 
 from components.settings import SimulationSettings
-
-
-def id_dict(key):
-    conditions = {
-        'bik': 1000,
-        'bus': 2000,
-        'mot': 3000,
-        'ped': 4000,
-        'tru': 5000,
-        'veh': 6000
-    }
-    return conditions.get(key[:3])
-
-
-def replace_id(id_key):
-    code_id = id_dict(id_key)  # get the code of a moving object
-    digit_index = re.search(r'\d', id_key).start()  # find the index position to cut the id
-    new_id = f'{code_id}{id_key[digit_index:]}'  # form the new id
-    return new_id
 
 
 class Simulation:
@@ -39,7 +21,16 @@ class Simulation:
     def run(self):
         traci.start(self.settings.sumoCmd)
 
-        one_trace = os.path.join(self.settings.trace_path, 'one_trace.txt')
+        one_trace_path = os.path.join(self.settings.trace_path, 'one_trace.txt')
+
+        dict_offset = {
+            'min_time': sys.maxsize,
+            'max_time': 0,
+            'min_x': sys.maxsize,
+            'max_x': 0,
+            'min_y': sys.maxsize,
+            'max_y': 0
+        }
 
         while traci.simulation.getMinExpectedNumber() > 0:
 
@@ -48,54 +39,81 @@ class Simulation:
             vehicles = traci.vehicle.getIDList()
             people = traci.person.getIDList()
 
-            self.write_trace(vehicles, people, one_trace)
+            dict_offset = self.write_trace(vehicles, people, one_trace_path, dict_offset)
             print(traci.simulation.getTime())
 
+        write_offset(one_trace_path, dict_offset)
         traci.close()
         time.sleep(5)
 
-    def write_trace(self, vehicles=None, people=None, one_trace=''):
+    def write_trace(self, vehicles=None, people=None, one_trace_path='', dict_offset=None):
         """
         writes the current position of each user in its respective simulation file
         :param vehicles: list of vehicles
         :param people: list of people
-        :param one_trace: path to the ns trace file
+        :param one_trace_path: path to the ns trace file
+        :param dict_offset: offset for the ONE trace
         """
+
+        users = vehicles + people
 
         timestamp = int(traci.simulation.getTime())
 
-        for i in range(0, len(vehicles)):
-            vehicle_id = vehicles[i]
-            x, y = traci.vehicle.getPosition(vehicle_id)
+        for index in range(0, len(users)):
+            id = users[index]
+            if index <= len(vehicles) - 1:
+                x, y = traci.vehicle.getPosition(id)
+            else:
+                x, y = traci.person.getPosition(id)
 
             x, y = round(x, 2), round(y, 2)
-            speed = round(traci.vehicle.getSpeed(vehicle_id), 2)
+            raw_record = f'{int(x)}, {int(y)}, {timestamp}\n'
+            one_record = f'{timestamp} {index} {int(x)} {int(y)}\n'
 
-            raw_record = f'{x}, {y}, {timestamp}\n'
-            one_record = f'{timestamp} {replace_id(vehicle_id)} {x} {y}\n'
+            raw_file = os.path.join(self.settings.trace_path, f'user{index}.csv')
 
-            raw_file = os.path.join(self.settings.trace_path, f'{vehicle_id}.csv')
+            with open(raw_file, 'a', newline='') as file:
+                file.write(raw_record)
 
-            with open(raw_file, 'a', newline='') as vehicle_file:
-                vehicle_file.write(raw_record)
-
-            with open(one_trace, 'a', newline='') as one_file:
+            with open(one_trace_path, 'a', newline='') as one_file:
                 one_file.write(one_record)
 
-        for i in range(0, len(people)):
-            person_id = people[i]
-            x, y = traci.person.getPosition(person_id)
+            dict_offset = check_offset(dict_offset, timestamp, x, y)
+        return dict_offset
 
-            x, y = round(x, 2), round(y, 2)
-            speed = round(traci.person.getSpeed(person_id), 2)
 
-            raw_record = f'{x}, {y}, {int(traci.simulation.getTime())}\n'
-            one_record = f'{timestamp} {replace_id(person_id)} {x} {y}\n'
+def check_offset(dict_offset, timestamp, x, y):
+    if timestamp < dict_offset.get('min_time'):
+        dict_offset['min_time'] = timestamp
 
-            raw_file = os.path.join(self.settings.trace_path, f'{person_id}.csv')
+    if timestamp > dict_offset.get('max_time'):
+        dict_offset['max_time'] = timestamp
 
-            with open(raw_file, 'a', newline='') as person_file:
-                person_file.write(raw_record)
+    if x < dict_offset.get('min_x'):
+        dict_offset['min_x'] = x
 
-            with open(one_trace, 'a', newline='') as one_file:
-                one_file.write(one_record)
+    if x > dict_offset.get('max_x'):
+        dict_offset['max_x'] = x
+
+    if y < dict_offset.get('min_y'):
+        dict_offset['min_y'] = y
+
+    if y > dict_offset.get('max_y'):
+        dict_offset['max_y'] = y
+
+    return dict_offset
+
+
+def write_offset(one_trace_path, dict_offset):
+    with open(one_trace_path, 'r') as file:
+        lines = file.readlines()
+
+    offset = (f'{dict_offset.get("min_time")} {dict_offset.get("max_time")} '
+              f'{dict_offset.get("min_x")} {dict_offset.get("max_x")} '
+              f'{dict_offset.get("min_y")} {dict_offset.get("max_y")} '
+              f'0.0 0.0')
+
+    lines.insert(0, offset + '\n')
+
+    with open(one_trace_path, 'w') as file:
+        file.writelines(lines)

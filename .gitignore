@@ -3,18 +3,4 @@
 
 components/__pycache__/
 
-CommunitiesIdentificationThroughFL/
-
-FLPUCI/utils/__pycache__/
-
-FLPUCI/pre_processing/__pycache__/
-
-FLPUCI/model/__pycache__/
-
-2023*/
-
-FLPUCI/model/tf/__pycache__/
-
-_manhattan/sim_*
-
-_times/sim_*
+2024*/
