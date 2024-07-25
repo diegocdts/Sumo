@@ -54,7 +54,7 @@ class Simulation:
                 x, y = traci.person.getPosition(user_id)
 
             x, y = round(x, 2), round(y, 2)
-            raw_record = f'{int(x)}, {int(y)}, {timestamp}\n'
+            raw_record = f'{int(x)}, {int(y)}, {index}, {timestamp}\n'
             one_record = f'{timestamp} {index} {int(x)} {int(y)}\n'
 
             raw_file = os.path.join(self.settings.trace_path, f'user{index}.csv')

@@ -40,4 +40,19 @@ def handle(path):
         file.writelines(lines)
 
 
-handle('2024-07-24-17-09-14/sim_24-07-24-18-23-43/one_trace.txt')
+def handle_report(dir, file_name):
+    report_path = os.path.join(dir, file_name)
+    new_file = os.path.join(dir, 'time_infection.txt')
+    time_infection = ''
+    with open(report_path, 'r') as file:
+        lines = file.readlines()
+        lines = [line for line in lines if line.__contains__(' R\n') or line.endswith(' D\n')]
+        for line in lines:
+            split = line.split(' ')
+            time = round(float(split[0]), 2)
+            infected = split[3]
+            new_line = f'{time} {infected}\n'
+            time_infection = f'{time_infection}{new_line}'
+    with open(new_file, 'w') as file:
+        file.writelines(time_infection)
+
