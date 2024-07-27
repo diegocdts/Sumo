@@ -2,6 +2,7 @@ import os
 import time
 import traci
 
+from components.handle_trace import handle
 from components.settings import SimulationSettings
 
 
@@ -33,6 +34,7 @@ class Simulation:
 
         traci.close()
         time.sleep(5)
+        handle(one_trace_path)
 
     def write_trace(self, vehicles=None, people=None, one_trace_path=''):
         """
