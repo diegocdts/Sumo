@@ -29,6 +29,24 @@ def handle(path):
     df_first_positions = df.drop_duplicates(subset='id', keep='first', ignore_index=True)
     df_first_positions.time = 0
     df = pd.concat([df_first_positions, df], ignore_index=True)
+
+    mapping_index_id = {}
+
+    for index, row in df_first_positions.iterrows():
+        mapping_index_id[row.id] = index
+
+    for index, row in df.iterrows():
+        df.at[index, 'id'] = mapping_index_id.get(row.id)
+
+    sim_path = path.replace('/one_trace.txt', '')
+
+    for file_name in os.listdir(sim_path):
+        if file_name != 'one_trace.txt':
+            file_id = file_name.replace('.csv', '')
+            current_file_path = f'{sim_path}/{file_name}'
+            new_file_path = f'{sim_path}/{mapping_index_id.get(file_id)}.csv'
+            os.rename(current_file_path, new_file_path)
+
     print(df)
 
     df.to_csv(path, sep=' ', index=False, header=False)
@@ -55,4 +73,3 @@ def handle_report(dir, file_name):
             time_infection = f'{time_infection}{new_line}'
     with open(new_file, 'w') as file:
         file.writelines(time_infection)
-

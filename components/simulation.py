@@ -22,7 +22,7 @@ class Simulation:
 
         one_trace_path = os.path.join(self.settings.trace_path, 'one_trace.txt')
 
-        while traci.simulation.getMinExpectedNumber() > 0:
+        while traci.simulation.getMinExpectedNumber() > 0 and traci.simulation.getTime() <= 3600:
 
             traci.simulationStep()
 
@@ -43,23 +43,33 @@ class Simulation:
         :param people: list of people
         :param one_trace_path: path to the ns trace file
         """
-
-        users = vehicles + people
-
         timestamp = int(traci.simulation.getTime())
 
-        for index in range(0, len(users)):
-            user_id = users[index]
-            if index <= len(vehicles) - 1:
-                x, y = traci.vehicle.getPosition(user_id)
-            else:
-                x, y = traci.person.getPosition(user_id)
+        for index in range(0, len(vehicles)):
+            user_id = vehicles[index]
+            x, y = traci.vehicle.getPosition(user_id)
 
             x, y = round(x, 2), round(y, 2)
             raw_record = f'{int(x)}, {int(y)}, {index}, {timestamp}\n'
-            one_record = f'{timestamp} {index} {int(x)} {int(y)}\n'
+            one_record = f'{timestamp} {user_id} {int(x)} {int(y)}\n'
 
-            raw_file = os.path.join(self.settings.trace_path, f'user{index}.csv')
+            raw_file = os.path.join(self.settings.trace_path, f'{user_id}.csv')
+
+            with open(raw_file, 'a', newline='') as file:
+                file.write(raw_record)
+
+            with open(one_trace_path, 'a', newline='') as one_file:
+                one_file.write(one_record)
+
+        for index in range(0, len(people)):
+            user_id = people[index]
+            x, y = traci.person.getPosition(user_id)
+
+            x, y = round(x, 2), round(y, 2)
+            raw_record = f'{int(x)}, {int(y)}, {index}, {timestamp}\n'
+            one_record = f'{timestamp} {user_id} {int(x)} {int(y)}\n'
+
+            raw_file = os.path.join(self.settings.trace_path, f'{user_id}.csv')
 
             with open(raw_file, 'a', newline='') as file:
                 file.write(raw_record)
