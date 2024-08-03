@@ -1,5 +1,6 @@
 import os
 
+import numpy as np
 import pandas as pd
 
 
@@ -14,6 +15,28 @@ def min_max(df):
     return min_time, max_time, min_x, max_x, min_y, max_y
 
 
+def x_initial(total_nodes, x_size):
+    positions = []
+    current = 0
+    for node in range(total_nodes):
+        positions.append(current)
+        if current < x_size - 25:
+            current += 25
+        else:
+            current = 0
+    return np.array(positions)
+
+
+def y_initial(x_positions, start):
+    positions = []
+    current = start - 25
+    for x in x_positions:
+        if x == 0:
+            current += 25
+        positions.append(current)
+    return np.array(positions)
+
+
 def handle(path):
 
     df = pd.read_csv(path, sep=' ', names=['time', 'id', 'x', 'y'], skiprows=1)
@@ -24,11 +47,20 @@ def handle(path):
     df.y = df.y - min_y
     min_time, max_time, min_x, max_x, min_y, max_y = min_max(df)
 
-    offset = f'{min_time} {max_time} {min_x} {max_x} {min_y} {max_y} 0 0\n'
-
     df_first_positions = df.drop_duplicates(subset='id', keep='first', ignore_index=True)
     df_first_positions.time = 0
+
+    x = x_initial(len(df_first_positions), max_x)
+    y = y_initial(x, max_y + 5)
+
+    df_first_positions.x = x
+    df_first_positions.y = y
+
     df = pd.concat([df_first_positions, df], ignore_index=True)
+
+    min_time, max_time, min_x, max_x, min_y, max_y = min_max(df)
+
+    offset = f'{min_time} {max_time} {min_x} {max_x} {min_y} {max_y} 0 0\n'
 
     mapping_index_id = {}
 
